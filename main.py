@@ -18,6 +18,7 @@ def reset_database():
 def connect_database():
     connection = sqlite3.connect('airline.db')
     cursor = connection.cursor()
+    connection.execute('PRAGMA foreign_keys = ON')
     return connection, cursor
 
 def establish_database(cursor):
@@ -27,6 +28,41 @@ def establish_database(cursor):
             airportName TEXT NOT NULL,
             country TEXT NOT NULL,
             city TEXT NOT NULL
+        )
+    ''')
+
+    cursor.execute('''
+        CREATE TABLE Pilot (
+            pilotId TEXT PRIMARY KEY,
+            licenseId TEXT NOT NULL,
+            firstName TEXT NOT NULL,
+            lastName TEXT NOT NULL,
+            rank TEXT NOT NULL
+        )
+    ''')
+
+    cursor.execute('''
+        CREATE TABLE Route (
+            routeId TEXT PRIMARY KEY,
+            durationMinutes INTEGER NOT NULL,
+            originAirportId TEXT NOT NULL,
+            destinationAirportId TEXT NOT NULL,
+            FOREIGN KEY (originAirportId) REFERENCES Airport(airportId),
+            FOREIGN KEY (destinationAirportId) REFERENCES Airport(airportId)
+        )
+    ''')
+
+    cursor.execute('''
+        CREATE TABLE Flight (
+            flightId TEXT PRIMARY KEY,
+            departureDateTime TEXT NOT NULL,
+            status TEXT NOT NULL,
+            routeId TEXT NOT NULL,
+            captainPilotId TEXT NOT NULL,
+            1stOfficerPilotId TEXT NOT NULL,
+            FOREIGN KEY (routeId) REFERENCES Route(routeId),
+            FOREIGN KEY (captainPilotId) REFERENCES Pilot(pilotId),       
+            FOREIGN KEY (1stOfficerPilotId) REFERENCES Pilot(pilotId)
         )
     ''')
 
@@ -42,15 +78,21 @@ def establish_database(cursor):
         VALUES (?, ?, ?, ?)
     ''', default_data)
 
+    connection.commit()
+
 def main():
     reset = reset_database()
     connection, cursor = connect_database()
 
     if reset:
-        establish_database(cursor)
-        connection.commit()
-        print("A new database has been initialized with default data.")
+        try:
+            establish_database(cursor)
+            print("A new database has been initialized with default data.")
+        except sqlite3.Error as e:
+            print("Database error:", e)
+            connection.rollback()
     
+    print("Database ready.")
     connection.close()
 
 main()
