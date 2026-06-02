@@ -66,32 +66,59 @@ def establish_database(cursor):
         )
     ''')
 
-    default_data = [
+    default_airport_data = [
         ("HKG", "Hong Kong International Airport", "China", "Hong Kong"),
         ("LAX", "Los Angeles International Airport", "United States", "Los Angeles"),
         ("NRT", "Narita International Airport", "Japan", "Narita"),
         ("LHR", "Heathrow Airport", "United Kingdom", "London")        
     ]
 
+    default_pilot_data = [
+        ("P001", "PIL-12345", "John", "Doe", "Captain"),
+        ("P002", "PIL-67890", "Jane", "Smith", "First Officer")
+    ]
+
+    default_route_data = [
+        ("CX001", 120, "HKG", "LAX"),
+        ("CX002", 180, "LAX", "NRT"),
+        ("CX003", 90, "NRT", "LHR"),
+        ("CX004", 150, "LHR", "HKG")
+    ]
+
+    default_flight_data = [
+        ("F001", "2023-06-01 08:00:00", "Scheduled", "CX001", "P001", "P002"),
+        ("F002", "2023-06-01 14:00:00", "Scheduled", "CX002", "P002", "P001")
+    ]
+
     cursor.executemany('''
         INSERT INTO Airport (airportId, airportName, country, city)
         VALUES (?, ?, ?, ?)
-    ''', default_data)
+    ''', default_airport_data)
 
-    connection.commit()
+    cursor.executemany('''
+        INSERT INTO Pilot (pilotId, licenseId, firstName, lastName, rank)
+        VALUES (?, ?, ?, ?, ?)
+    ''', default_pilot_data)
+
+    cursor.executemany('''
+        INSERT INTO Route (routeId, durationMinutes, originAirportId, destinationAirportId)
+        VALUES (?, ?, ?, ?)
+    ''', default_route_data)
+
+    cursor.executemany('''
+        INSERT INTO Flight (flightId, departureDateTime, status, routeId, captainPilotId, 1stOfficerPilotId)
+        VALUES (?, ?, ?, ?, ?, ?)
+    ''', default_flight_data)
 
 def main():
     reset = reset_database()
     connection, cursor = connect_database()
 
     if reset:
-        try:
-            establish_database(cursor)
-            print("A new database has been initialized with default data.")
-        except sqlite3.Error as e:
-            print("Database error:", e)
-            connection.rollback()
-    
+        establish_database(cursor)
+        print("A new database has been initialized with default data.")
+        connection.commit()
+
     print("Database ready.")
     connection.close()
 
