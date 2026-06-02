@@ -106,7 +106,7 @@ def establish_database(cursor):
     ''', default_route_data)
 
     cursor.executemany('''
-        INSERT INTO Flight (flightId, departureDateTime, status, routeId, captainPilotId, 1stOfficerPilotId)
+        INSERT INTO Flight (flightId, departureDateTime, status, routeId, captainPilotId, firstOfficerPilotId)
         VALUES (?, ?, ?, ?, ?, ?)
     ''', default_flight_data)
 
