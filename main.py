@@ -59,10 +59,10 @@ def establish_database(cursor):
             status TEXT NOT NULL,
             routeId TEXT NOT NULL,
             captainPilotId TEXT NOT NULL,
-            1stOfficerPilotId TEXT NOT NULL,
+            firstOfficerPilotId TEXT NOT NULL,
             FOREIGN KEY (routeId) REFERENCES Route(routeId),
             FOREIGN KEY (captainPilotId) REFERENCES Pilot(pilotId),       
-            FOREIGN KEY (1stOfficerPilotId) REFERENCES Pilot(pilotId)
+            FOREIGN KEY (firstOfficerPilotId) REFERENCES Pilot(pilotId)
         )
     ''')
 
@@ -116,9 +116,9 @@ def main():
 
     if reset:
         establish_database(cursor)
-        print("A new database has been initialized with default data.")
         connection.commit()
-
+        print("A new database has been initialized with default data.")
+        
     print("Database ready.")
     connection.close()
 
