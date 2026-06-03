@@ -35,7 +35,7 @@ def sub_menu_summary():
     print("2. Number of flights assigned to each pilot")
     print("0. Back")
 
-def navigate_menu():
+def navigate_menu(connection, cursor):
     while True:
         menu_main()
         choice = input("Select an option: ").strip()
@@ -122,6 +122,7 @@ def main():
             print("A new database has been initialized with default data.")
             
         print("Database ready.")
+        navigate_menu(connection, cursor)
         
     except sqlite3.Error as e:
          print(f"Application aborted due to an error: {e}")   
@@ -134,7 +135,7 @@ def main():
         except:
             pass
 
-    navigate_menu()
+
 
 if __name__ == "__main__":
     main()
