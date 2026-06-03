@@ -22,7 +22,7 @@ def connect_database():
         cursor.execute('PRAGMA foreign_keys = ON')
         return connection, cursor
     except sqlite3.Error as e:
-        print(f"We encountered an error when connecting to the database: {e}")
+        print(f"An error occured when connecting to the database: {e}")
         raise
 
 def establish_database(cursor):
@@ -144,5 +144,5 @@ def establish_database(cursor):
         ''', default_flight_data)
     
     except sqlite3.Error as e:
-        print(f"We encountered an error when establishing and populating the database: {e}")
+        print(f"An error occured when establishing the database: {e}")
         raise
