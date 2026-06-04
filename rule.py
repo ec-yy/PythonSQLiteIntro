@@ -6,6 +6,9 @@ def right_table(table):
 
 
 def record_exists(cursor, table, primary_key_column, primary_key_value):  
+    if not right_table(table):
+        return False
+    
     query = f"SELECT 1 FROM {table} WHERE {primary_key_column} = ?"
     cursor.execute(query, (primary_key_value,))
     return cursor.fetchone() is not None

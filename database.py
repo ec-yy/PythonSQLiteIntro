@@ -1,6 +1,7 @@
 import sqlite3
 import os
 
+
 def reset_database():
     if os.path.exists('airline.db'):
         while True:

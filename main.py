@@ -1,6 +1,7 @@
 import sqlite3
 from database import connect_database, reset_database, establish_database
 
+
 def menu_main():
     print("\n<=== Flight Management Appplication Main Menu ===>")
     print("1. All: View")
