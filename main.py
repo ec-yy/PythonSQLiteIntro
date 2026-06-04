@@ -110,7 +110,7 @@ def navigate_menu(connection, cursor):
             print("Invalid option. Please try again.")
 
 def main():
-    connection = None # To avoid scenario where "finally" block attempts to close a connection that does not exist
+    connection = None #To avoid scenario where "finally" block attempts to close a connection that does not exist
     
     try:
         reset = reset_database()

@@ -4,12 +4,12 @@ import os
 def reset_database():
     if os.path.exists('airline.db'):
         while True:
-            choice = input("The system detects an existing database. Do you wish to reset it? (Y/N): ").strip().upper()
-            if choice == 'Y':
+            user_choice = input("The system detects an existing database. Do you wish to reset it? (Y/N): ").strip().upper()
+            if user_choice == 'Y':
                 os.remove('airline.db')
                 print("A new database will be created to override the existing database.")
                 return True
-            elif choice == 'N':
+            elif user_choice == 'N':
                 print("The system will continue to use the existing database.")
                 return False
     else:
@@ -29,8 +29,8 @@ def establish_database(cursor):
     try:        
         cursor.execute('''
                 CREATE TABLE IF NOT EXISTS Airport (
-                    airportId TEXT PRIMARY KEY,
-                    airportName TEXT NOT NULL,
+                    airport_id TEXT PRIMARY KEY,
+                    airport_name TEXT NOT NULL,
                     country TEXT NOT NULL,
                     city TEXT NOT NULL
                 )
@@ -38,36 +38,36 @@ def establish_database(cursor):
 
         cursor.execute('''
                 CREATE TABLE IF NOT EXISTS Pilot (
-                    pilotId TEXT PRIMARY KEY,
-                    licenseId TEXT NOT NULL,
-                    firstName TEXT NOT NULL,
-                    lastName TEXT NOT NULL,
+                    pilot_id TEXT PRIMARY KEY,
+                    license_id TEXT NOT NULL,
+                    first_name TEXT NOT NULL,
+                    last_name TEXT NOT NULL,
                     rank TEXT NOT NULL
                 )
             ''')
 
         cursor.execute('''
                 CREATE TABLE IF NOT EXISTS Route (
-                    routeId TEXT PRIMARY KEY,
-                    durationMinutes INTEGER NOT NULL,
-                    originAirportId TEXT NOT NULL,
-                    destinationAirportId TEXT NOT NULL,
-                    FOREIGN KEY (originAirportId) REFERENCES Airport(airportId),
-                    FOREIGN KEY (destinationAirportId) REFERENCES Airport(airportId)
+                    route_id TEXT PRIMARY KEY,
+                    duration_minutes INTEGER NOT NULL,
+                    origin_airport_id TEXT NOT NULL,
+                    destination_airport_id TEXT NOT NULL,
+                    FOREIGN KEY (origin_airport_id) REFERENCES Airport(airport_id),
+                    FOREIGN KEY (destination_airport_id) REFERENCES Airport(airport_id)
                 )
             ''')
 
         cursor.execute('''
                 CREATE TABLE IF NOT EXISTS Flight (
-                    flightId TEXT PRIMARY KEY,
-                    departureDateTime TEXT NOT NULL,
+                    flight_id TEXT PRIMARY KEY,
+                    departure_date_time TEXT NOT NULL,
                     status TEXT NOT NULL,
-                    routeId TEXT NOT NULL,
-                    captainPilotId TEXT NOT NULL,
-                    firstOfficerPilotId TEXT NOT NULL,
-                    FOREIGN KEY (routeId) REFERENCES Route(routeId),
-                    FOREIGN KEY (captainPilotId) REFERENCES Pilot(pilotId),       
-                    FOREIGN KEY (firstOfficerPilotId) REFERENCES Pilot(pilotId)
+                    route_id TEXT NOT NULL,
+                    captain_pilot_id TEXT NOT NULL,
+                    first_officer_pilot_id TEXT NOT NULL,
+                    FOREIGN KEY (route_id) REFERENCES Route(route_id),
+                    FOREIGN KEY (captain_pilot_id) REFERENCES Pilot(pilot_id),
+                    FOREIGN KEY (first_officer_pilot_id) REFERENCES Pilot(pilot_id)
                 )
             ''')
 
@@ -124,22 +124,22 @@ def establish_database(cursor):
         ]
 
         cursor.executemany('''
-            INSERT INTO Airport (airportId, airportName, country, city)
+            INSERT INTO Airport (airport_id, airport_name, country, city)
             VALUES (?, ?, ?, ?)
         ''', default_airport_data)
 
         cursor.executemany('''
-            INSERT INTO Pilot (pilotId, licenseId, firstName, lastName, rank)
+            INSERT INTO Pilot (pilot_id, license_id, first_name, last_name, rank)
             VALUES (?, ?, ?, ?, ?)
         ''', default_pilot_data)
 
         cursor.executemany('''
-            INSERT INTO Route (routeId, durationMinutes, originAirportId, destinationAirportId)
+            INSERT INTO Route (route_id, duration_minutes, origin_airport_id, destination_airport_id)
             VALUES (?, ?, ?, ?)
         ''', default_route_data)
 
         cursor.executemany('''
-            INSERT INTO Flight (flightId, departureDateTime, status, routeId, captainPilotId, firstOfficerPilotId)
+            INSERT INTO Flight (flight_id, departure_date_time, status, route_id, captain_pilot_id, first_officer_pilot_id)
             VALUES (?, ?, ?, ?, ?, ?)
         ''', default_flight_data)
     
