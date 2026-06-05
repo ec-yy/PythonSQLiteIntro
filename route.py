@@ -11,8 +11,7 @@ def add_new_route(connection, cursor):
 
     duration = positive_integer_input("Please provide duration (in minutes): ")
 
-    origin = None
-    destination = None
+    origin, destination = None, None
 
     while True:
         # Ask for origin only if we don't have a valid one yet
