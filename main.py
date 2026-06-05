@@ -1,21 +1,24 @@
 import sqlite3
 from database import connect_database, reset_database, establish_database
+from rule import view_table
+from airport import add_new_airport, view_update_airport
+from route import add_new_route
 
 
 def menu_main():
-    print("\n<=== Flight Management Appplication Main Menu ===>")
+    print("\n\n<=== Flight Management Appplication Main Menu ===>")
     print("1. All: View")
     print("2. All: Add")
     print("3. Flight: View flights by criteria")
     print("4. Flight: Update flight information")
     print("5. Pilot: Assign pilot to flight")
     print("6. Pilot: View pilot schedule")
-    print("7. Route: View or update destination information")
+    print("7. Airport: View or update airport information")
     print("8. All: Summary reports")
     print("0. Exit")
 
 def sub_menu_view():
-    print("\n<--- Sub Menu: View --->")
+    print("\n\n<--- Sub Menu: View --->")
     print("1. View all airports")
     print("2. View all routes")
     print("3. View all pilots")
@@ -23,7 +26,7 @@ def sub_menu_view():
     print("0. Back")
 
 def sub_menu_add():
-    print("\n<--- Sub Menu: Add --->")
+    print("\n\n<--- Sub Menu: Add --->")
     print("1. Add a new airport")
     print("2. Add a new route")
     print("3. Add a new pilot")
@@ -46,13 +49,13 @@ def navigate_menu(connection, cursor):
                 sub_menu_view()
                 sub_choice = input("Select an option: ").strip()
                 if sub_choice == "1":
-                    view_table(cursor, "Airport", "airportId, airportName, country, city", "airportId")
+                    view_table(cursor, "Airport", order_by="airportId")
                 elif sub_choice == "2":
-                    view_table(cursor, "Route", "routeId, durationMinutes, originAirportId, destinationAirportId", "routeId")
+                    view_table(cursor, "Route", order_by="routeId")
                 elif sub_choice == "3":
-                    view_table(cursor, "Pilot", "pilotId, licenseId, firstName, lastName, rank", "pilotId")
+                    view_table(cursor, "Pilot", order_by="pilotId")
                 elif sub_choice == "4":
-                    view_table(cursor, "Flight", "flightId, departureDateTime, status, routeId, captainPilotId, firstOfficerPilotId", "departureDateTime")
+                    view_table(cursor, "Flight", order_by="departureDateTime")
                 elif sub_choice == "0":
                     break
                 else:
@@ -135,7 +138,6 @@ def main():
 
         except:
             pass
-
 
 
 if __name__ == "__main__":

@@ -31,6 +31,28 @@ def integer_input(system_prompt):
             print("User input must be an integer. Try again.")
 
 
+def positive_integer_input(system_prompt):
+    while True:
+        user_input = input(system_prompt).strip()
+        try:
+            value = int(user_input)
+            if value > 0:
+                return value
+            else:
+                print("User input must be greater than 0. Try again.")
+        except ValueError:
+            print("User input must be an integer. Try again.")
+
+
+def boolean_input(system_prompt):
+    while True:
+        user_input = input(system_prompt).strip().upper()
+        if user_input in ("Y", "N"):
+            return user_input
+        else:
+            print("Invalid input. Acceptable input is Y or N only.")
+
+
 def view_table(cursor, table_name, columns="*", order_by=None):
     query = f"SELECT {columns} FROM {table_name}"
     if order_by:

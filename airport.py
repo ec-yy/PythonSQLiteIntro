@@ -1,4 +1,4 @@
-from rule import non_empty_input, record_exists
+from rule import non_empty_input, boolean_input, record_exists
 
 
 def add_new_airport(connection, cursor):
@@ -6,7 +6,7 @@ def add_new_airport(connection, cursor):
     airport_id = non_empty_input("Please provide airport ID (e.g. NRT): ").upper()
 
     if record_exists(cursor, "Airport", "airport_id", airport_id):
-        print(f"Airport {airport_id} exists in the table. If you would like to update underlying information, please use option 7 instead.")
+        print(f"Sorry. Airport {airport_id} exists in the table. Go to option 7 of main menu if you would like to update airport records.")
         return
 
     airport_name = non_empty_input("Airport name: ")
@@ -24,7 +24,7 @@ def add_new_airport(connection, cursor):
         connection.commit()
         print(f"Airport {airport_id} is successfully added to the table Airport.")
     except Exception as e:
-        print("Database error occur when adding a new airport:", e)
+        print("Failure in addition of airport: ", e)
 
 
 def view_update_airport(connection, cursor):
@@ -33,7 +33,7 @@ def view_update_airport(connection, cursor):
 
     cursor.execute(
         """
-        SELECT airport_id, airport_name, country, city
+        SELECT *
         FROM Airport
         WHERE airport_id = ?
         """,
@@ -50,14 +50,18 @@ def view_update_airport(connection, cursor):
     print(f"   Country : {row[2]}")
     print(f"   City    : {row[3]}")
 
-    print("\nPress Enter to keep the current value.")
-    new_name = input(f"New airport name [{row[1]}]: ").strip()
-    new_country = input(f"New country [{row[2]}]: ").strip()
-    new_city = input(f"New city [{row[3]}]: ").strip()
+    user_input = boolean_input("Do you want to update the information of this Airport record? (Y/N): ")
+    if user_input == 'N':
+        return
 
-    updated_name = new_name if new_name else row[1]
-    updated_country = new_country if new_country else row[2]
-    updated_city = new_city if new_city else row[3]
+    print("\nSimply press enter to skip the current record and keep the current value.")
+    revised_name = input(f"New airport name [{row[1]}]: ").strip()
+    revised_country = input(f"New country [{row[2]}]: ").strip()
+    revised_city = input(f"New city [{row[3]}]: ").strip()
+
+    updated_name = revised_name if revised_name else row[1]
+    updated_country = revised_country if revised_country else row[2]
+    updated_city = revised_city if revised_city else row[3]
 
     try:
         cursor.execute(

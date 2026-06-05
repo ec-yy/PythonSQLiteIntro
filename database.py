@@ -1,20 +1,21 @@
 import sqlite3
 import os
+from rule import boolean_input 
 
 
 def reset_database():
     if os.path.exists('airline.db'):
-        while True:
-            user_choice = input("The system detects an existing database. Do you wish to reset it? (Y/N): ").strip().upper()
-            if user_choice == 'Y':
-                os.remove('airline.db')
-                print("A new database will be created to override the existing database.")
-                return True
-            elif user_choice == 'N':
-                print("The system will continue to use the existing database.")
-                return False
+        user_input = boolean_input("The system detects an existing database. Do you wish to reset it? (Y/N): ")
+        if user_input == 'Y':
+            os.remove('airline.db')
+            print("A new database will be created to override the existing database.")
+            return True
+        else:
+            print("The system will continue to use the existing database.")
+            return False
     else:
         return True
+
 
 def connect_database():
     try:
@@ -25,6 +26,7 @@ def connect_database():
     except sqlite3.Error as e:
         print(f"An error occured when connecting to the database: {e}")
         raise
+
 
 def establish_database(cursor):
     try:        
