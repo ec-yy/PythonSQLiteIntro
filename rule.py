@@ -76,7 +76,7 @@ def valid_id_input(system_prompt, pattern, example):
             print(f"Invalid input. The input should conform to a prescribed format (e.g., {example}). Try again.")
 
 
-def valid_date_time_format(system_prompt, mandatory_input)
+def valid_date_time_format(system_prompt, mandatory_input):
     """
     Repeatedly prompts the user until a valid datetime is entered
     in YYYY-MM-DD HH:MM:SS format.
