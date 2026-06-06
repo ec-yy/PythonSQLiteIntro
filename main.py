@@ -4,9 +4,9 @@ from rule import view_table
 from airport import add_new_airport, view_update_airport
 from route import add_new_route
 
-
+# Functions for different menu views and navigation.
 def menu_main():
-    print("\n\n<=== Flight Management Appplication Main Menu ===>")
+    print("\n\n<=== Flight Management Application Main Menu ===>")
     print("1. All: View")
     print("2. All: Add")
     print("3. Flight: View flights by criteria")
@@ -49,13 +49,13 @@ def navigate_menu(connection, cursor):
                 sub_menu_view()
                 sub_choice = input("Select an option: ").strip()
                 if sub_choice == "1":
-                    view_table(cursor, "Airport", order_by="airportId")
+                    view_table(cursor, "Airport", order_by="airport_id")
                 elif sub_choice == "2":
-                    view_table(cursor, "Route", order_by="routeId")
+                    view_table(cursor, "Route", order_by="route_id")
                 elif sub_choice == "3":
-                    view_table(cursor, "Pilot", order_by="pilotId")
+                    view_table(cursor, "Pilot", order_by="pilot_id")
                 elif sub_choice == "4":
-                    view_table(cursor, "Flight", order_by="departureDateTime")
+                    view_table(cursor, "Flight", order_by="departure_date_time")
                 elif sub_choice == "0":
                     break
                 else:
@@ -113,21 +113,28 @@ def navigate_menu(connection, cursor):
         else:
             print("Invalid option. Please try again.")
 
+
+
 def main():
-    connection = None #To avoid scenario where "finally" block attempts to close a connection that does not exist
+    # To avoid scenario where "finally" block attempts to close a connection that does not exist.
+    connection = None 
     
     try:
+    # Prompt user to decide whether to reset the database.
+    # If yes, old database will be removed and a new database will be created.    
         reset = reset_database()
         connection, cursor = connect_database()
 
         if reset:
             establish_database(cursor)
+            # Only commit when tables are created and default data is inserted.
             connection.commit()
             print("A new database has been initialized with default data.")
             
         print("Database ready.")
         navigate_menu(connection, cursor)
         
+    # This can catch the re-thrown error when calling functions in database.py, and any other error that may occur in this fucntion.
     except sqlite3.Error as e:
          print(f"Application aborted due to an error: {e}")   
 

@@ -4,19 +4,19 @@ from rule import non_empty_input, boolean_input, conformed_id_input, record_exis
 def add_new_airport(connection, cursor):
     print("\n<--- Add a New Airport --->")
 
-    #Provide an airport ID that conforms to a prescribed format (i.e., 3 uppercase letters)
+    #Provide an airport ID that conforms to a prescribed format (i.e., 3 uppercase letters).
     airport_id = conformed_id_input("Please provide airport ID (e.g. NRT): ", r"^[A-Z]{3}$", "e.g., NRT")
 
     if record_exists(cursor, "Airport", "airport_id", airport_id):
         print(f"Sorry. Airport {airport_id} exists in the table. Go to option 7 of main menu if you would like to update airport records.")
         return
 
-    # Provide an airport name, country and city. All of them must be non-empty strings
+    # Provide an airport name, country and city. All of them must be non-empty strings.
     airport_name = non_empty_input("Airport name: ")
     country = non_empty_input("Country: ")
     city = non_empty_input("City: ")
 
-    # Try to add a new airport to the table Airport based on user input and catch any exception
+    # Try to add a new airport to the table Airport based on user input and catch any exception.
     try:
         cursor.execute(
             """
@@ -35,7 +35,7 @@ def add_new_airport(connection, cursor):
 def view_update_airport(connection, cursor):
     print("\n<--- View or Update Airport --->")
 
-    # Provide an airport ID that conforms to a prescribed format (i.e., 3 uppercase letters)
+    # Provide an airport ID that conforms to a prescribed format (i.e., 3 uppercase letters).
     airport_id = conformed_id_input("Please provide airport ID (e.g. NRT): ", r"^[A-Z]{3}$", "e.g., NRT")
 
     # Try to fetch the airport record based on airport ID provided by user.
