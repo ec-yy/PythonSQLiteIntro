@@ -119,6 +119,20 @@ def valid_date_format(system_prompt):
         except ValueError:
             print("Sorry. The date format is invalid. Please use YYYY-MM-DD (e.g. 2026-06-06). Try again.")
 
+
+def validate_pilot_rank(cursor, pilot_id, expected_rank):
+    """
+    Checks that the given pilot holds the expected rank.
+    - expected_rank: "Captain" or "First Officer"
+    - Returns True if rank matches, False otherwise.
+    """
+    cursor.execute("SELECT rank FROM Pilot WHERE pilot_id = ?", (pilot_id,))
+    row = cursor.fetchone()
+    if row and row[0] == expected_rank:
+        return True
+    return False
+
+
 # ── General function for view of complete records of a table ────────────────────────────────────────────────────────────
 def view_table(cursor, table_name, columns="*", order_by=None):
     query = f"SELECT {columns} FROM {table_name}"

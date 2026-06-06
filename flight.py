@@ -6,7 +6,7 @@
 #   - flight_summary_by_destination → Menu 8.1
 #   - flight_summary_by_pilot       → Menu 8.2
 
-from rule import valid_id_input, valid_date_time_format, valid_date_format, valid_choice, record_exists
+from rule import valid_id_input, valid_date_time_format, valid_date_format, valid_choice, validate_pilot_rank, record_exists
 
 # ── Constants ────────────────────────────────────────────────────────────────
 
@@ -62,24 +62,32 @@ def add_new_flight(connection, cursor):
 
     status = _prompt_status()
 
-    route_id = valid_id_input("Enter Route ID: ", r"^[A-Z]{2}[0-9]{3}$", "e.g., CX001")
-    if not record_exists(cursor, "Route", "route_id", route_id):
-        print(f"Sorry. Route {route_id} is not found in the table Route. Please add the route first.")
-        return
+    while True:
+        route_id = valid_id_input("Enter Route ID: ", r"^[A-Z]{2}[0-9]{3}$", "e.g., CX001")
+        if not record_exists(cursor, "Route", "route_id", route_id):
+            print(f"Sorry. Route {route_id} is not found in the table Route. Please try again.")
+            continue
+        break
 
-    captain_id = valid_id_input("Enter Captain Pilot ID: ", r"^[A-Z][0-9]{3}$", "e.g., P001")
-    if not record_exists(cursor, "Pilot", "pilot_id", captain_id):
-        print(f"Sorry. Captain {captain_id} is not found in the table Pilot. Please add the pilot first.")
-        return
+    while True:
+        captain_id = valid_id_input("Enter Captain Pilot ID: ", r"^[A-Z][0-9]{3}$", "e.g., P001")
+        if not record_exists(cursor, "Pilot", "pilot_id", captain_id):
+            print(f"Sorry. Captain {captain_id} is not found in the table Pilot. Please try again.")
+            continue
+        if not validate_pilot_rank(cursor, captain_id, "Captain"):
+            print(f"Sorry. Pilot {captain_id} does not hold the rank of Captain. Please try again.")
+            continue
+        break
 
-    first_officer_id = valid_id_input("Enter First Officer Pilot ID: ", r"^[A-Z][0-9]{3}$", "e.g., P001")
-    if not record_exists(cursor, "Pilot", "pilot_id", first_officer_id):
-        print(f"Sorry. First Officer {first_officer_id} is not found in the table Pilot. Please add the pilot first.")
-        return
-
-    if captain_id == first_officer_id:
-        print("Sorry. Captain and First Officer cannot be the same pilot.")
-        return
+    while True:
+        first_officer_id = valid_id_input("Enter First Officer Pilot ID: ", r"^[A-Z][0-9]{3}$", "e.g., P001")
+        if not record_exists(cursor, "Pilot", "pilot_id", first_officer_id):
+            print(f"Sorry. First Officer {first_officer_id} is not found in the table Pilot. Please try again.")
+            continue
+        if not validate_pilot_rank(cursor, first_officer_id, "First Officer"):
+            print(f"Sorry. Pilot {first_officer_id} does not hold the rank of First Officer. Please try again.")
+            continue
+        break
 
     try:
         cursor.execute("""
