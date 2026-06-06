@@ -3,10 +3,11 @@ from database import connect_database, reset_database, establish_database
 from rule import view_table
 from airport import add_new_airport, view_update_airport
 from route import add_new_route
+from pilot import add_new_pilot, view_pilot_schedule, assign_pilot_to_flight
 
 # Functions for different menu views and navigation.
 def menu_main():
-    print("\n\n<=== Flight Management Application Main Menu ===>")
+    print("\n\n<===== Flight Management Application Main Menu =====>")
     print("1. All: View")
     print("2. All: Add")
     print("3. Flight: View flights by criteria")
@@ -18,7 +19,7 @@ def menu_main():
     print("0. Exit")
 
 def sub_menu_view():
-    print("\n\n<--- Sub Menu: View --->")
+    print("\n\n<----- Sub Menu: View ----->")
     print("1. View all airports")
     print("2. View all routes")
     print("3. View all pilots")
@@ -26,7 +27,7 @@ def sub_menu_view():
     print("0. Back")
 
 def sub_menu_add():
-    print("\n\n<--- Sub Menu: Add --->")
+    print("\n\n<----- Sub Menu: Add ----->")
     print("1. Add a new airport")
     print("2. Add a new route")
     print("3. Add a new pilot")
@@ -34,7 +35,7 @@ def sub_menu_add():
     print("0. Back")
 
 def sub_menu_summary():
-    print("\n<--- Sub Menu: Summary Reports --->    ")
+    print("\n<----- Sub Menu: Summary Reports ----->    ")
     print("1. Number of flights to each destination")
     print("2. Number of flights assigned to each pilot")
     print("0. Back")

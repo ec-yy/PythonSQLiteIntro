@@ -49,13 +49,14 @@ def positive_integer_input(system_prompt):
             print("Invalid input. User input must be an integer. Try again.")
 
 
-def boolean_input(system_prompt):
+def boolean_input(system_prompt, input_mode):
     while True:
-        user_input = input(system_prompt).strip().upper()
-        if user_input in ("Y", "N"):
+        raw_input = input(system_prompt).strip()
+        user_input = raw_input.upper() if input_mode == 'Y/N' else raw_input
+        if (input_mode == "Y/N" and user_input in ("Y", "N")) or (input_mode == "1/2" and user_input in ("1", "2")):
             return user_input
         else:
-            print("Invalid input. User input must be Y or N only. Try again.")
+            print(f"Invalid input. User input must be {input_mode} only. Try again.")
 
 
 def conformed_id_input(system_prompt, pattern, example):
