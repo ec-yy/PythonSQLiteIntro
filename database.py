@@ -24,7 +24,7 @@ def connect_database():
         cursor.execute('PRAGMA foreign_keys = ON')
         return connection, cursor
     except sqlite3.Error as e:
-        print(f"An error occured when connecting to the database: {e}")
+        print(f"An error occurred when connecting to the database: {e}")
         # Ensure the error is raised to main() and caught the outer try-exception block there.
         raise
 
@@ -71,16 +71,16 @@ def establish_database(cursor):
     ]
 
     default_flight_data = [
-        ("F001", "2026-06-10 08:00:00", "Scheduled", "CX001", "P001", "P002"),
-        ("F002", "2026-06-10 12:00:00", "Scheduled", "CX002", "P003", "P004"),
+        ("F001", "2026-06-10 08:00:00", "Arrived", "CX001", "P001", "P002"),
+        ("F002", "2026-06-10 12:00:00", "Departed", "CX002", "P003", "P004"),
         ("F003", "2026-06-11 09:00:00", "Delayed", "CX003", "P005", "P006"),
-        ("F004", "2026-06-11 14:30:00", "Scheduled", "CX004", "P007", "P008"),
+        ("F004", "2026-06-11 14:30:00", "On Schedule", "CX004", "P007", "P008"),
         ("F005", "2026-06-12 07:15:00", "Cancelled", "CX005", "P009", "P010"),
-        ("F006", "2026-06-12 16:00:00", "Scheduled", "CX006", "P001", "P004"),
-        ("F007", "2026-06-13 10:45:00", "Scheduled", "CX007", "P003", "P006"),
+        ("F006", "2026-06-12 16:00:00", "On Schedule", "CX006", "P001", "P004"),
+        ("F007", "2026-06-13 10:45:00", "On Schedule", "CX007", "P003", "P006"),
         ("F008", "2026-06-13 20:00:00", "Delayed", "CX008", "P005", "P008"),
-        ("F009", "2026-06-14 06:30:00", "Scheduled", "CX009", "P007", "P010"),
-        ("F010", "2026-06-14 11:20:00", "Scheduled", "CX010", "P009", "P002")
+        ("F009", "2026-06-14 06:30:00", "On Schedule", "CX009", "P007", "P010"),
+        ("F010", "2026-06-14 11:20:00", "On Schedule", "CX010", "P009", "P002")
         ]    
     
     
@@ -152,7 +152,7 @@ def establish_database(cursor):
         ''', default_flight_data)
     
     except sqlite3.Error as e:
-        print(f"An error occured when establishing the database: {e}")
+        print(f"An error occurred when establishing the database: {e}")
         # Ensure the error is raised to main() and caught the outer try-exception block there.
         # Ensure connection.commit() is never called.
         raise

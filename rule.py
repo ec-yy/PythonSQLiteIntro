@@ -50,14 +50,7 @@ def positive_integer_input(system_prompt):
             print("Invalid input. User input must be an integer. Try again.")
 
 
-def boolean_input(system_prompt, input_mode):
-    while True:
-        raw_input = input(system_prompt).strip()
-        user_input = raw_input.upper() if input_mode == 'Y/N' else raw_input
-        if (input_mode == "Y/N" and user_input in ("Y", "N")) or (input_mode == "1/2" and user_input in ("1", "2")):
-            return user_input
-        else:
-            print(f"Sorry. Invalid input. User input must be {input_mode} only. Try again.")
+
 
 
 def valid_choice(system_prompt, choice):
@@ -83,7 +76,7 @@ def valid_id_input(system_prompt, pattern, example):
             print(f"Invalid input. The input should conform to a prescribed format (e.g., {example}). Try again.")
 
 
-def valid_date_time_format(system_prompt):
+def valid_date_time_format(system_prompt, mandatory_input)
     """
     Repeatedly prompts the user until a valid datetime is entered
     in YYYY-MM-DD HH:MM:SS format.
@@ -96,7 +89,12 @@ def valid_date_time_format(system_prompt):
     """
     pattern = "%Y-%m-%d %H:%M:%S"
     while True:
-        user_input = non_empty_input(system_prompt)
+        if mandatory_input == True:
+            user_input = non_empty_input(system_prompt)
+        else:
+            user_input = input(system_prompt).strip()
+            if not user_input:
+                return None
         try:
             parsed_input = datetime.strptime(user_input, pattern)
             return parsed_input.strftime(pattern)
@@ -134,6 +132,6 @@ def view_table(cursor, table_name, columns="*", order_by=None):
         print(f"No records were found in {table_name}.")
         return
 
-    print(f"\n<--- {table_name} Complete Records --->")
+    print(f"\n<----- {table_name} Complete Records ----->")
     for row in rows:
         print(row)
