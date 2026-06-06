@@ -1,11 +1,11 @@
 import sqlite3
 import os
-from rule import boolean_input 
+from rule import valid_choice 
 
 
 def reset_database():
     if os.path.exists('airline.db'):
-        user_input = boolean_input("The system detects an existing database. Do you wish to reset it? (Y/N): ", "Y/N")
+        user_input = valid_choice("The system detects an existing database. Do you wish to reset it? (Y/N): ", ["Y", "N"])
         if user_input == 'Y':
             os.remove('airline.db')
             print("A new database will be created to override the existing database.")

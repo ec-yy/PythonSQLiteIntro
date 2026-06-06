@@ -1,16 +1,17 @@
 import re
+from datetime import datetime
 
-# Functions for checking right table and record pre-existence.
-def right_table(table):
-    right_tables = {"Airport", "Route", "Pilot", "Flight"}
-    if not table in right_tables:
+# ── Functions for checking right table and record pre-existence ────────────────────────────────────────────────────────────
+def valid_table(table):
+    valid_tables = {"Airport", "Route", "Pilot", "Flight"}
+    if not table in valid_tables:
         print(f"{table} is not valid.")
         return False
     return True
 
 
 def record_exists(cursor, table, primary_key_column, primary_key_value):  
-    if not right_table(table):
+    if not valid_table(table):
         return False
     
     query = f"SELECT 1 FROM {table} WHERE {primary_key_column} = ?"
@@ -18,7 +19,7 @@ def record_exists(cursor, table, primary_key_column, primary_key_value):
     return cursor.fetchone() is not None
 
 
-# Functions for user input validation.
+# ── Functions for user input validation ────────────────────────────────────────────────────────────
 def non_empty_input(system_prompt):
     while True:
         user_input = input(system_prompt).strip()
@@ -56,10 +57,19 @@ def boolean_input(system_prompt, input_mode):
         if (input_mode == "Y/N" and user_input in ("Y", "N")) or (input_mode == "1/2" and user_input in ("1", "2")):
             return user_input
         else:
-            print(f"Invalid input. User input must be {input_mode} only. Try again.")
+            print(f"Sorry. Invalid input. User input must be {input_mode} only. Try again.")
 
 
-def conformed_id_input(system_prompt, pattern, example):
+def valid_choice(system_prompt, choice):
+    hint = " / ".join(choice)
+    while True:
+        user_input = input(system_prompt).strip().upper()
+        if user_input in choice:
+            return user_input
+        print(f"Sorry. Invalid input. User input must be from {hint} only. Try again.")
+
+
+def valid_id_input(system_prompt, pattern, example):
     while True:
         user_input = input(system_prompt).strip().upper()
 
@@ -73,7 +83,28 @@ def conformed_id_input(system_prompt, pattern, example):
             print(f"Invalid input. The input should conform to a prescribed format (e.g., {example}). Try again.")
 
 
-# General function for view of complete records of a table.
+def valid_date_time_format(system_prompt):
+    """
+    Repeatedly prompts the user until a valid datetime is entered
+    in YYYY-MM-DD HH:MM:SS format.
+
+    - Uses datetime.strptime to validate both format AND calendar logic
+      (e.g. rejects Feb 31, month 13, hour 25, etc.)
+    - Re-formats via strftime to normalise edge cases
+      (e.g. user types 2026-6-6 9:5:0 → stored as 2026-06-06 09:05:00)
+    - Returns the validated string, ready for SQLite datetime() calculations.
+    """
+    pattern = "%Y-%m-%d %H:%M:%S"
+    while True:
+        user_input = non_empty_input(system_prompt)
+        try:
+            parsed_input = datetime.strptime(user_input, pattern)
+            return parsed_input.strftime(pattern)
+        except ValueError:
+            print("Sorry. The date and time format is invalid. Please use YYYY-MM-DD HH:MM:SS (e.g. 2026-06-06 14:30:00). Try again.")
+
+
+# ── General function for view of complete records of a table ────────────────────────────────────────────────────────────
 def view_table(cursor, table_name, columns="*", order_by=None):
     query = f"SELECT {columns} FROM {table_name}"
     if order_by:
