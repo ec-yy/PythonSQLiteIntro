@@ -1,9 +1,10 @@
-from rule import non_empty_input, boolean_input, record_exists
+from rule import non_empty_input, boolean_input, conformed_id_input, record_exists
 
 
 def add_new_airport(connection, cursor):
     print("\n<--- Add a New Airport --->")
-    airport_id = non_empty_input("Please provide airport ID (e.g. NRT): ").upper()
+
+    airport_id = conformed_id_input("Please provide airport ID (e.g. NRT): ", r"^[A-Z]{3}$", "e.g., NRT")
 
     if record_exists(cursor, "Airport", "airport_id", airport_id):
         print(f"Sorry. Airport {airport_id} exists in the table. Go to option 7 of main menu if you would like to update airport records.")
@@ -29,7 +30,8 @@ def add_new_airport(connection, cursor):
 
 def view_update_airport(connection, cursor):
     print("\n<--- View or Update Airport --->")
-    airport_id = non_empty_input("Enter airport ID (e.g., NRT) to view/update: ").upper()
+
+    airport_id = conformed_id_input("Please provide airport ID (e.g. NRT): ", r"^[A-Z]{3}$", "e.g., NRT")
 
     cursor.execute(
         """
@@ -54,7 +56,7 @@ def view_update_airport(connection, cursor):
     if user_input == 'N':
         return
 
-    print("\nSimply press enter to skip the current record and keep the current value.")
+    print("\nSimply press enter to skip the current field and keep the current value.")
     revised_name = input(f"New airport name [{row[1]}]: ").strip()
     revised_country = input(f"New country [{row[2]}]: ").strip()
     revised_city = input(f"New city [{row[3]}]: ").strip()

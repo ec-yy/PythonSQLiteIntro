@@ -1,3 +1,5 @@
+import re
+
 def right_table(table):
     right_tables = {"Airport", "Route", "Pilot", "Flight"}
     if not table in right_tables:
@@ -19,7 +21,7 @@ def non_empty_input(system_prompt):
         user_input = input(system_prompt).strip()
         if user_input:
             return user_input
-        print("User input must not be empty. Try again.")
+        print("User input must be non-empty. Try again.")
 
 
 def integer_input(system_prompt):
@@ -28,7 +30,7 @@ def integer_input(system_prompt):
         try:
             return int(user_input)
         except ValueError:
-            print("User input must be an integer. Try again.")
+            print("Invalid input. User input must be an integer. Try again.")
 
 
 def positive_integer_input(system_prompt):
@@ -39,9 +41,9 @@ def positive_integer_input(system_prompt):
             if value > 0:
                 return value
             else:
-                print("User input must be greater than 0. Try again.")
+                print("Invalid input.User input must be a positive integer. Try again.")
         except ValueError:
-            print("User input must be an integer. Try again.")
+            print("Invalid input. User input must be an integer. Try again.")
 
 
 def boolean_input(system_prompt):
@@ -50,7 +52,21 @@ def boolean_input(system_prompt):
         if user_input in ("Y", "N"):
             return user_input
         else:
-            print("Invalid input. Acceptable input is Y or N only.")
+            print("Invalid input. User input must be Y or N only. Try again.")
+
+
+def conformed_id_input(system_prompt, pattern, example):
+    while True:
+        user_input = input(system_prompt).strip().upper()
+
+        if not user_input:
+            print("User input must be non-empty. Try again.")
+            continue
+
+        if re.fullmatch(pattern, user_input):
+            return user_input
+        else:
+            print(f"Invalid input. The input should conform to a prescribed format (e.g., {example}). Try again.")
 
 
 def view_table(cursor, table_name, columns="*", order_by=None):
