@@ -49,10 +49,10 @@ def view_pilot_schedule(cursor):
                flight.departure_date_time,
                datetime(flight.departure_date_time, '+' || route.duration_minutes || ' minutes') AS arrival_date_time,
                flight.status,
-               origin_airport.city AS from_city,
                origin_airport.country AS from_country,
-               destination_airport.city AS to_city,
+               origin_airport.city AS from_city,
                destination_airport.country AS to_country
+               destination_airport.city AS to_city,
         FROM Flight flight
         JOIN Route route ON flight.route_id = route.route_id
         JOIN Airport origin_airport ON route.origin_airport_id = origin_airport.airport_id
@@ -101,6 +101,6 @@ def assign_pilot_to_flight(connection, cursor):
             WHERE flight_id = ?
         """, (pilot_id, flight_id))
         connection.commit()
-        print(f"Great! Pilot {pilot_id} is successfullyassigned to flight {flight_id}.")
+        print(f"Great! Pilot {pilot_id} is successfully assigned to flight {flight_id}.")
     except Exception as e:
         print(f"Sorry. Error when assigning pilot {pilot_id} to flight {flight_id}: {e}")

@@ -104,6 +104,23 @@ def valid_date_time_format(system_prompt):
             print("Sorry. The date and time format is invalid. Please use YYYY-MM-DD HH:MM:SS (e.g. 2026-06-06 14:30:00). Try again.")
 
 
+def valid_date_format(system_prompt):
+    """
+    Prompts the user for a date in YYYY-MM-DD format.
+    - Allows blank input (returns None) — used for optional search filters.
+    - Uses datetime.strptime to validate calendar logic
+      (e.g. rejects Feb 31, month 13, etc.)
+    - Returns the validated date string, or None if left blank.
+    """
+    pattern = "%Y-%m-%d"
+    while True:
+        user_input = non_empty_input(system_prompt)
+        try:
+            parsed_input = datetime.strptime(user_input, pattern)
+            return parsed_input.strftime(pattern)
+        except ValueError:
+            print("Sorry. The date format is invalid. Please use YYYY-MM-DD (e.g. 2026-06-06). Try again.")
+
 # ── General function for view of complete records of a table ────────────────────────────────────────────────────────────
 def view_table(cursor, table_name, columns="*", order_by=None):
     query = f"SELECT {columns} FROM {table_name}"

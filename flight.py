@@ -6,7 +6,7 @@
 #   - flight_summary_by_destination → Menu 8.1
 #   - flight_summary_by_pilot       → Menu 8.2
 
-from rule import non_empty_input, valid_id_input, valid_date_time_format, valid_choice, record_exists, menu_choice
+from rule import valid_id_input, valid_date_time_format, valid_date_format, valid_choice, record_exists
 
 # ── Constants ────────────────────────────────────────────────────────────────
 
@@ -66,21 +66,21 @@ def add_new_flight(connection, cursor):
 
     route_id = valid_id_input("Enter Route ID: ", r"^[A-Z]{2}[0-9]{3}$", "e.g., CX001")
     if not record_exists(cursor, "Route", "route_id", route_id):
-        print(f"Route {route_id} not found. Please add the route first.")
+        print(f"Sorry. Route {route_id} is not found in the table Route. Please add the route first.")
         return
 
     captain_id = valid_id_input("Enter Captain Pilot ID: ", r"^[A-Z]{1}[0-9]{3}$", "e.g., P001")
     if not record_exists(cursor, "Pilot", "pilot_id", captain_id):
-        print(f"Captain {captain_id} not found. Please add the pilot first.")
+        print(f"Sorry. Captain {captain_id} is not found in the table Pilot. Please add the pilot first.")
         return
 
     first_officer_id = valid_id_input("Enter First Officer Pilot ID: ", r"^[A-Z]{1}[0-9]{3}$", "e.g., P001")
     if not record_exists(cursor, "Pilot", "pilot_id", first_officer_id):
-        print(f"First Officer {first_officer_id} not found. Please add the pilot first.")
+        print(f"Sorry. First Officer {first_officer_id} is not found in the table Pilot. Please add the pilot first.")
         return
 
     if captain_id == first_officer_id:
-        print("Captain and First Officer cannot be the same pilot.")
+        print("Sorry. Captain and First Officer cannot be the same pilot.")
         return
 
     try:
@@ -88,98 +88,120 @@ def add_new_flight(connection, cursor):
             INSERT INTO Flight
                 (flight_id, departure_date_time, status, route_id, captain_pilot_id, first_officer_pilot_id)
             VALUES (?, ?, ?, ?, ?, ?)
-        """, (flight_id, departure, status, route_id, captain_id, first_officer_id))
+        """, (flight_id, departure_date_time, status, route_id, captain_id, first_officer_id))
         connection.commit()
-        print(f"Flight {flight_id} added successfully.")
+        print(f"Great! Flight {flight_id} is successfully added to the table Flight.")
     except Exception as e:
-        print("Database error when adding flight:", e)
+        print("Sorry. Failure in addition of flight:", e)
 
 
+# Function to view flights by user-defined criteria
 def view_flights_by_criteria(cursor):
     """
     Display flights filtered by destination city, status, and/or departure date.
     All filters are optional — press Enter to skip any of them.
     """
-    print("\n--- View Flights by Criteria ---")
-    print("Leave a field blank to skip that filter.\n")
+    print("\n<----- View Flights by Criteria ----->")
+    print("Please leave the field blank to skip the filter.\n")
 
-    destination = input("Destination city: ").strip()
+    # Departure date filter — only require input of departure date if the user wants to filter by departure date
+    # valid_choice is configured to ensure non-empty input
+    if valid_choice("Do you want to apply filter by departure date? (Y/N): ", ["Y", "N"]) == "Y":
+        departure_date = valid_date_format("Date of Departure (Input format: YYYY-MM-DD, or blank to skip): ")
 
     # Status filter — only show the menu if the user wants to filter by status
-    use_status = input("Filter by status? (Y/N): ").strip().upper()
+    filter_by_status = valid_choice("Do you want to apply filter by flight status? (Y/N): ", ["Y", "N"])
     status_filter = None
-    if use_status == "Y":
+    if filter_by_status == "Y":
         status_filter = _prompt_status()
 
-    date = input("Departure date (YYYY-MM-DD, or blank to skip): ").strip()
+    destination_country = input("Destination country: ").strip()
+
+    destination_city = input("Destination city: ").strip()
 
     query = """
-        SELECT f.flightId,
-               f.departureDateTime,
-               f.status,
-               a1.city AS fromCity,
-               a2.city   AS toCity
-        FROM Flight f
-        JOIN Route   r  ON f.routeId              = r.routeId
-        JOIN Airport a1 ON r.originAirportId      = a1.airportId
-        JOIN Airport a2 ON r.destinationAirportId = a2.airportId
+        SELECT flight.flight_id,
+               flight.departure_date_time,
+               flight.status,
+               origin_airport.city AS from_city,
+               origin_airport.country AS from_country,
+               destination_airport.city AS to_city,
+               destination_airport.country AS to_country
+        FROM Flight flight
+        JOIN Route route ON flight.route_id = route.route_id
+        JOIN Airport origin_airport ON route.origin_airport_id = origin_airport.airport_id
+        JOIN Airport destination_airport ON route.destination_airport_id = destination_airport.airport_id
         WHERE 1 = 1
     """
-    params = []
+    parameter = []
 
-    if destination:
-        query += " AND a2.city LIKE ?"
-        params.append(f"%{destination}%")
+    if departure_date:
+        query += " AND flight.departure_date_time LIKE ?"
+        parameter.append(f"{departure_date}%")
 
     if status_filter:
-        query += " AND f.status = ?"
-        params.append(status_filter)
+        query += " AND flight.status = ?"
+        parameter.append(status_filter)
 
-    if date:
-        query += " AND f.departureDateTime LIKE ?"
-        params.append(f"{date}%")
+    if destination_country:
+        query += " AND destination_airport.country LIKE ?"
+        parameter.append(f"%{destination_country}%")
 
-    query += " ORDER BY f.departureDateTime"
+    if destination_city:
+        query += " AND destination_airport.city LIKE ?"
+        parameter.append(f"%{destination_city}%")
 
-    cursor.execute(query, params)
+    query += " ORDER BY flight.departure_date_time"
+
+    cursor.execute(query, parameter)
     rows = cursor.fetchall()
 
     if not rows:
-        print("\nNo flights found for these criteria.")
+        print("\nSorry. No flights can be found for these criteria.")
         return
 
-    print("\n{:<10} {:<22} {:<12} {:<12} {}".format(
-        "Flight", "Departure", "Status", "From", "To"))
-    print("-" * 65)
+    print("\n{:<10} {:<22} {:<12} {:<12} {:<18} {:<12} {}".format(
+        "Flight", "Departure Date and Time", "Status", "From Country", "From City", "To Country", "To City"))
+    print("-" * 100)
     for row in rows:
-        print("{:<10} {:<22} {:<12} {:<12} {}".format(
-            row[0], row[1], row[2], row[3], row[4]))
+        print("{:<10} {:<22} {:<12} {:<12} {:<18} {:<12} {}".format(
+            row[0], row[1], row[2], row[3], row[4], row[5], row[6]))
 
-
+# Function to update flight information (departure datetiem and status)
 def update_flight_information(connection, cursor):
     """Update the departure datetime and/or status of an existing flight."""
-    print("\n--- Update Flight Information ---")
-    flight_id = require_non_empty("Enter Flight ID to update: ").upper()
+    print("\n<----- Update Flight Information ----->")
+    flight_id = valid_id_input("Enter Flight ID (e.g. F001): ", r"^[A-Z][0-9]{3}$", "e.g., F001")
 
     cursor.execute("""
-        SELECT flightId, departureDateTime, status
+        SELECT flight_id, departure_date_time, status
         FROM Flight
-        WHERE flightId = ?
+        WHERE flight_id = ?
     """, (flight_id,))
     row = cursor.fetchone()
 
     if not row:
-        print(f"Flight {flight_id} not found.")
+        print(f"Sorry. Flight {flight_id} is not found in the table Flight.")
         return
 
     print(f"\nCurrent record:")
-    print(f"  Flight ID  : {row[0]}")
-    print(f"  Departure  : {row[1]}")
-    print(f"  Status     : {row[2]}")
-    print("\nPress Enter to keep the current value.")
+    print(f"  Flight ID                : {row[0]}")
+    print(f"  Departure Date and Time  : {row[1]}")
+    print(f"  Status                   : {row[2]}")
 
-    new_departure = input(f"New departure datetime [{row[1]}]: ").strip()
-    updated_departure = new_departure if new_departure else row[1]
+    # Prompt user if they want to update the flight information.
+    user_input = valid_choice("Do you want to update the information of this Flight record? (Y/N): ", ["Y", "N"])
+    if user_input == 'N':
+        return
+
+    print("\nSimply press enter to skip the current field and keep the current value.") 
+    prompt = f"New departure date and time [{row[1]}] (Input Format: YYYY-MM-DD HH:MM:SS, or leave blank to skip): "
+    raw_input = input(prompt).strip()
+
+    if raw_input == "":
+        updated_departure_date_time = row[1]      # keep current value
+    else:
+        updated_departure_date_time = valid_date_time_format(prompt)
 
     # Reuse _prompt_status with current value so Enter keeps it unchanged
     updated_status = _prompt_status(current=row[2])
@@ -187,13 +209,13 @@ def update_flight_information(connection, cursor):
     try:
         cursor.execute("""
             UPDATE Flight
-            SET departureDateTime = ?, status = ?
-            WHERE flightId = ?
-        """, (updated_departure, updated_status, flight_id))
+            SET departure_date_time = ?, status = ?
+            WHERE flight_id = ?
+        """, (updated_departure_date_time, updated_status, flight_id))
         connection.commit()
-        print("Flight updated successfully.")
+        print(f"Great! Flight {flight_id} is updated successfully.")
     except Exception as e:
-        print("Database error when updating flight:", e)
+        print(f"Sorry. Database error when updating flight {flight_id}: {e}")
 
 
 def flight_summary_by_destination(cursor):
@@ -201,27 +223,27 @@ def flight_summary_by_destination(cursor):
     Aggregate report: total number of flights grouped by destination city.
     Maps to Menu 8.1.
     """
-    print("\n--- Number of Flights to Each Destination ---")
+    print("\n<----- Number of Flights by Destination ----->")
     cursor.execute("""
-        SELECT a.city,
-               a.country,
-               COUNT(*) AS flightCount
-        FROM Flight f
-        JOIN Route   r ON f.routeId              = r.routeId
-        JOIN Airport a ON r.destinationAirportId = a.airportId
-        GROUP BY a.airportId
-        ORDER BY flightCount DESC
+        SELECT airport.city,
+               airport.country,
+               COUNT(*) AS flight_count
+        FROM Flight flight
+        JOIN Route route ON flight.route_id = route.route_id
+        JOIN Airport airport ON route.destination_airport_id = airport.airport_id
+        GROUP BY airport.airport_id
+        ORDER BY flight_count DESC
     """)
     rows = cursor.fetchall()
 
     if not rows:
-        print("No flight data available.")
+        print("Sorry.No flight data is available.")
         return
 
-    print("\n{:<22} {:<18} {}".format("Destination City", "Country", "Flights"))
+    print("\n{:<18} {:<22} {}".format("Destination Country", "City", "No. of Flights"))
     print("-" * 50)
     for row in rows:
-        print("{:<22} {:<18} {}".format(row[0], row[1], row[2]))
+        print("{:<18} {:<22} {}".format(row[0], row[1], row[2]))
 
 
 def flight_summary_by_pilot(cursor):
@@ -230,27 +252,27 @@ def flight_summary_by_pilot(cursor):
     Counts flights where the pilot appears as either Captain or First Officer.
     Maps to Menu 8.2.
     """
-    print("\n--- Number of Flights Assigned to Each Pilot ---")
+    print("\n<----- Flight Summary by Pilot ----->")
     cursor.execute("""
-        SELECT p.pilotId,
-               p.firstName || ' ' || p.lastName AS fullName,
-               p.rank,
-               COUNT(*) AS flightCount
-        FROM Pilot p
-        JOIN Flight f
-          ON p.pilotId = f.captainPilotId
-          OR p.pilotId = f.firstOfficerPilotId
-        GROUP BY p.pilotId
-        ORDER BY flightCount DESC
+        SELECT pilot.pilot_id,
+               pilot.first_name || ' ' || pilot.last_name AS full_name,
+               pilot.rank,
+               COUNT(*) AS flight_count
+        FROM Pilot pilot
+        JOIN Flight flight
+          ON pilot.pilot_id = flight.captain_pilot_id
+          OR pilot.pilot_id = flight.first_officer_pilot_id
+        GROUP BY pilot.pilot_id
+        ORDER BY flight_count DESC
     """)
     rows = cursor.fetchall()
 
     if not rows:
-        print("No pilot assignment data available.")
+        print("Sorry. No pilot assignment data is available.")
         return
 
     print("\n{:<10} {:<28} {:<18} {}".format(
-        "Pilot ID", "Name", "Rank", "Flights"))
+        "Pilot ID", "Full Name", "Rank", "Flights"))
     print("-" * 65)
     for row in rows:
         print("{:<10} {:<28} {:<18} {}".format(

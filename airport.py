@@ -46,7 +46,8 @@ def view_update_airport(connection, cursor):
         print(f"Sorry. Airport {airport_id} is not found in the table Airport.")
         return
 
-    print(f"\nAirport {airport_id}:")
+    print(f"\nCurrent record:")
+    print(f"Airport {airport_id}:")
     print(f"   Name    : {row[1]}")
     print(f"   Country : {row[2]}")
     print(f"   City    : {row[3]}")
@@ -73,7 +74,7 @@ def view_update_airport(connection, cursor):
             WHERE airport_id = ?
         """, (updated_name, updated_country, updated_city, airport_id))
         connection.commit()
-        print(f"Great! Airport {airport_id} updated successfully.")
+        print(f"Great! Airport {airport_id} is updated successfully.")
     
     except Exception as e:
-        print("Sorry. Database error when updating airport:", e)
+        print(f"Sorry. Database error when updating airport {airport_id}: {e}")

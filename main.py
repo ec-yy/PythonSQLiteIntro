@@ -4,6 +4,7 @@ from rule import view_table
 from airport import add_new_airport, view_update_airport
 from route import add_new_route
 from pilot import add_new_pilot, view_pilot_schedule, assign_pilot_to_flight
+from flight import add_new_flight, view_flights_by_criteria, update_flight_information, flight_summary_by_destination, flight_summary_by_pilot
 
 # Functions for different menu views and navigation.
 def menu_main():
