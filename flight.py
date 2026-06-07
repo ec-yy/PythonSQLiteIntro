@@ -1,24 +1,20 @@
 # This module contains functions to undertake flight-related operations, including:
-
-# flight.py
-# Handles all flight-related operations:
 #   - add_new_flight                → Menu 2.4 (Add new flight)
-#   - view_flights_by_criteria      → Menu 3   (View flights by criteria)
-#   - update_flight_information     → Menu 4   (Update flight information)
-#   - flight_summary_by_destination → Menu 8.1
-#   - flight_summary_by_pilot       → Menu 8.2
+#   - flight_summary_by_destination → Menu 3.1 (Number of flight by each destination)
+#   - flight_summary_by_pilot       → Menu 3.2 (Number of flight by each pilot)
+#   - view_flights_by_criteria      → Menu 4   (View flights by criteria)
+#   - update_flight_information     → Menu 5   (Update flight information)
 
-from rule import valid_id_input, valid_date_time_format, valid_date_format, valid_choice, valid_pilot_rank, record_exists
+from rule import record_exists, valid_pilot_rank, valid_choice, valid_id_input, valid_date_time_format, valid_date_format 
+
 
 # ── Constants ────────────────────────────────────────────────────────────────
 
-# Maps numeric menu choice → status string.
-# Square-bracket access is safe here because menu_choice() guarantees
-# the key will always be "1", "2", or "3".
+# This is for static mapping of numeric menu choice to status in string.
 STATUS_MAP = {"1": "On Schedule", "2": "Delayed", "3": "Cancelled", "4": "Departed", "5": "Arrived"}
 
 
-# ── Helper ───────────────────────────────────────────────────────────────────
+# ── Functions ───────────────────────────────────────────────────────────────────
 
 def _prompt_status(current=None):
     """
@@ -57,7 +53,7 @@ def add_new_flight(connection, cursor):
     flight_id = valid_id_input("Please provide a flight ID (e.g. F001): ", r"^[A-Z][0-9]{3}$", "e.g., F001")
 
     if record_exists(cursor, "Flight", "flight_id", flight_id):
-        print(f"Sorry. Flight (ID: {flight_id}) already exists in the table <Flgiht>. Go to <Main Menu → Option 4> to update individual flight record.")
+        print(f"Sorry. Flight (ID: {flight_id}) already exists in the table <Flight>. Go to <Main Menu → Option 4> to update individual flight record.")
         return
 
     departure_date_time = valid_date_time_format("Enter departure date and time (YYYY-MM-DD HH:MM:SS): ", mandatory_input=True)

@@ -4,6 +4,9 @@
 
 from rule import non_empty_input, valid_choice, valid_id_input, record_exists
 
+
+# ── Functions ───────────────────────────────────────────────────────────────────
+
 # Function to add a new airport
 def add_new_airport(connection, cursor):
     print("\n<----- Add a New Airport ----->")
