@@ -59,7 +59,7 @@ def add_new_flight(connection, cursor):
 
     # Provide a valid route ID that exists in the corresponding tables.
     while True:
-        route_id = valid_id_input("Enter route ID (e.g. CX001): ", r"^[A-Z]{2}[0-9]{3}$", "e.g., CX001")
+        route_id = valid_id_input("Enter route ID (e.g. AY001): ", r"^[A-Z]{2}[0-9]{3}$", "e.g., AY001")
         if not record_exists(cursor, "Route", "route_id", route_id):
             print(f"Sorry. Route (ID: {route_id}) is not found in the table <Route>. Please try again.")
             continue

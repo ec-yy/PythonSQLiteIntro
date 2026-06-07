@@ -1,3 +1,6 @@
+# It is the main module, which serves as the entry point of the Flight Management Application.
+# It is Python-based command-line interface (CLI) and allow users to interact through its main and sub menus.
+
 import sqlite3
 from database import connect_database, reset_database, establish_database
 from rule import view_table
@@ -116,7 +119,7 @@ def navigate_menu(connection, cursor):
             print("Sorry. Invalid input. Please try again.")
 
 
-
+# A function to run the main program
 def main():
     # To avoid scenario where "finally" block attempts to close a connection that does not exist.
     connection = None 
@@ -151,4 +154,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-

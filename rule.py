@@ -50,6 +50,7 @@ def valid_pilot_rank(cursor, pilot_id, expected_rank):
     return False
 
 # ── 2. Functions - User Input Validation ────────────────────────────────────────────────────────────
+
 def non_empty_input(system_prompt):
     while True:
         user_input = input(system_prompt).strip()
@@ -141,6 +142,7 @@ def valid_date_format(system_prompt):
             print("Sorry. The date format is invalid. Please use YYYY-MM-DD (e.g. 2026-06-06). Try again.")
 
 # ── 3. Functions - Common Utilities ────────────────────────────────────────────────────────────
+
 def view_table(cursor, table_name, columns="*", order_by=None):
     query = f"SELECT {columns} FROM {table_name}"
     if order_by:
