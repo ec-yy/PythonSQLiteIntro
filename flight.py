@@ -160,7 +160,7 @@ def view_flights_by_criteria(cursor):
     # <valid_choice> is configured to ensure input is either "Y" or "N".
     departure_date = None
     if valid_choice("Do you want to apply filter by departure date? (Y/N): ", ["Y", "N"]) == "Y":
-        departure_date = valid_date_format("Date of Departure (Input Format: YYYY-MM-DD): ")
+        departure_date = valid_date_format("Date of Departure (Input Format: YYYY-MM-DD) (Note: You can still press <Enter> to skip): ", mandatory_input=False)
 
     # Status filter — required only if the user wants to filter by status.
     status_filter = None
