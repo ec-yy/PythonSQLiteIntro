@@ -9,15 +9,15 @@ def add_new_airport(connection, cursor):
     print("\n<----- Add a New Airport ----->")
 
     # Provide an airport ID that conforms to a prescribed format (i.e., 3 uppercase letters).
-    airport_id = valid_id_input("Please provide airport ID (e.g. NRT): ", r"^[A-Z]{3}$", "e.g., NRT")
+    airport_id = valid_id_input("Please provide an airport ID (e.g. NRT): ", r"^[A-Z]{3}$", "e.g., NRT")
     if record_exists(cursor, "Airport", "airport_id", airport_id):
-        print(f"Sorry. Airport {airport_id} already exists in the table. Go to option 7 of main menu if you would like to update airport records.")
+        print(f"Sorry. Airport (ID: {airport_id}) already exists in the table <Airport>. Go to <Main Menu → Option 7> to update individual airport record.")
         return
 
     # Provide an airport name, country and city. All of them must be non-empty strings.
-    airport_name = non_empty_input("Airport name: ")
-    country = non_empty_input("Country: ")
-    city = non_empty_input("City: ")
+    airport_name = non_empty_input("Enter airport name: ")
+    country = non_empty_input("Enter country: ")
+    city = non_empty_input("Enter city: ")
 
     # Try to add a new airport to the table Airport based on user input and catch any exception.
     try:
@@ -26,9 +26,9 @@ def add_new_airport(connection, cursor):
             VALUES (?, ?, ?, ?)
         """, (airport_id, airport_name, country, city))
         connection.commit()
-        print(f"Great! Airport {airport_id} is successfully added to the table Airport.")
+        print(f"Great! Airport {airport_id} is added to the table <Airport>.")
     except Exception as e:
-        print("Sorry. Failure in addition of airport: ", e)
+        print("Sorry. Failure in operation <Add a new airport>: ", e)
 
 
 # Function to view or update specific airport information
@@ -36,7 +36,7 @@ def view_update_airport(connection, cursor):
     print("\n<----- View or Update Airport ----->")
 
     # Provide an airport ID that conforms to a prescribed format (i.e., 3 uppercase letters).
-    airport_id = valid_id_input("Please provide airport ID (e.g. NRT): ", r"^[A-Z]{3}$", "e.g., NRT")
+    airport_id = valid_id_input("Please provide an airport ID (e.g. NRT): ", r"^[A-Z]{3}$", "e.g., NRT")
 
     # Try to fetch the airport record based on airport ID provided by user.
     cursor.execute("""
@@ -47,24 +47,24 @@ def view_update_airport(connection, cursor):
     row = cursor.fetchone()
 
     if not row:
-        print(f"Sorry. Airport {airport_id} is not found in the table Airport.")
+        print(f"Sorry. Airport (ID: {airport_id}) is not found in the table <Airport>.")
         return
 
     print(f"\nCurrent record:")
-    print(f"Airport {airport_id}:")
+    print(f"Airport (ID: {airport_id}):")
     print(f"   Name    : {row[1]}")
     print(f"   Country : {row[2]}")
     print(f"   City    : {row[3]}")
 
     # Prompt user if they want to update the airport information.
-    user_input = valid_choice("Do you want to update the information of this Airport record? (Y/N): ", ["Y", "N"])
+    user_input = valid_choice(f"Do you want to update information of Airport (ID: {airport_id})? (Y/N): ", ["Y", "N"])
     if user_input == 'N':
         return
 
-    print("\nSimply press enter to skip the current field and keep the current value.")
-    revised_name = input(f"New airport name [{row[1]}]: ").strip()
-    revised_country = input(f"New country [{row[2]}]: ").strip()
-    revised_city = input(f"New city [{row[3]}]: ").strip()
+    print("Press <Enter> to keep the value in current field.")
+    revised_name = input(f"New airport name (Old: {row[1]}): ").strip()
+    revised_country = input(f"New country (Old: {row[2]}): ").strip()
+    revised_city = input(f"New city (Old: {row[3]}): ").strip()
 
     updated_name = revised_name if revised_name else row[1]
     updated_country = revised_country if revised_country else row[2]
@@ -78,7 +78,7 @@ def view_update_airport(connection, cursor):
             WHERE airport_id = ?
         """, (updated_name, updated_country, updated_city, airport_id))
         connection.commit()
-        print(f"Great! Airport {airport_id} is updated successfully.")
+        print(f"Great! Airport (ID: {airport_id}) is updated.")
     
     except Exception as e:
-        print(f"Sorry. Database error when updating airport {airport_id}: {e}")
+        print(f"Sorry. Database error when updating airport (ID: {airport_id}): {e}")

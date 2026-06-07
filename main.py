@@ -81,21 +81,6 @@ def navigate_menu(connection, cursor):
                     print("Invalid option. Please try again.")
 
         elif choice == "3":
-            view_flights_by_criteria(cursor)
-
-        elif choice == "4":
-            update_flight_information(connection, cursor)
-
-        elif choice == "5":
-            assign_pilot_to_flight(connection, cursor)
-
-        elif choice == "6":
-            view_pilot_schedule(cursor)
-
-        elif choice == "7":
-            view_update_airport(connection, cursor)
-
-        elif choice == "8":
             while True:
                 sub_menu_summary()
                 sub_choice = input("Select an option: ").strip()
@@ -107,6 +92,21 @@ def navigate_menu(connection, cursor):
                     break
                 else:
                     print("Invalid option. Please try again.")
+
+        elif choice == "4":
+            view_flights_by_criteria(cursor)
+
+        elif choice == "5":
+            update_flight_information(connection, cursor)
+
+        elif choice == "6":
+            assign_pilot_to_flight(connection, cursor)
+
+        elif choice == "7":
+            view_pilot_schedule(cursor)
+
+        elif choice == "8":
+            view_update_airport(connection, cursor)
 
         elif choice == "0":
             print("Goodbye.")

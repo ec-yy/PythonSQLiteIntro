@@ -47,8 +47,8 @@ def view_pilot_schedule(cursor):
         SELECT flight.flight_id,
                route.route_id,
                flight.departure_date_time,
-               datetime(flight.departure_date_time, '+' || route.duration_minutes || ' minutes') AS arrival_date_time,
-               printf('%02d', route.duration_minutes / 60) || ':' || printf('%02d', route.duration_minutes % 60) AS duration_hhmm,
+               strftime('%Y-%m-%d %H:%M', datetime(flight.departure_date_time, '+' || route.duration_minutes || ' minutes')) AS arrival_date_time,
+               printf('%02d', route.duration_minutes / 60) || ':' || printf('%02d', route.duration_minutes % 60) AS duration_hours_minutes,
                flight.status,
                origin_airport.country AS from_country,
                origin_airport.city AS from_city,
@@ -68,10 +68,15 @@ def view_pilot_schedule(cursor):
         print(f"Sorry. Pilot {pilot_id} has no scheduled flights.")
         return
 
-    print(f"\nSchedule for Pilot {pilot_id}:")
+    print(f"\n<----- Flight Schedule (Number of records: {len(rows)}) ----->")
+    print()
+    print("{:<7} {:<6} {:<20} {:<19} {:<10} {:<13} {:<14} {:<14} {:<14} {}".format(
+        "Flight", "Route", "Departure Date/Time", "Arrival Date/Time", "Duration", "Status",
+        "From Country", "From City", "To Country", "To City"))
+    print("-" * 135)
     for row in rows:
-        print(f"  Flight: {row[0]} | Route: {row[1]} | Depart: {row[2]} | Arrive: {row[3]} | Duration (Minutes) {row[4]} : {row[4]}"
-                f" | Status: {row[5]} | From: {row[6]}, {row[7]} → To: {row[8]}, {row[9]}")
+        print("{:<7} {:<6} {:<20} {:<19} {:<10} {:<13} {:<14} {:<14} {:<14} {}".format(
+            row[0], row[1], row[2], row[3], row[4], row[5], row[6], row[7], row[8], row[9]))
 
 
 # Function to assign a pilot to a flight

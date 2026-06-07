@@ -10,7 +10,7 @@ def reset_database():
         user_input = valid_choice("The system detects an existing database. Do you wish to reset it? (Y/N): ", ["Y", "N"])
         if user_input == 'Y':
             os.remove('airline.db')
-            print("A new database will be created to override the existing database.")
+            print("A new database will be created to supersede the existing database.")
             return True
         else:
             print("The system will continue to use the existing database.")
@@ -34,7 +34,7 @@ def connect_database():
 def establish_database(cursor):
     
     default_airport_data = [
-        ("HKG", "Hong Kong International Airport", "Hong Kong", "Hong Kong"),
+        ("HEL", "Helsinki-Vantaa Airport", "Finland", "Helsinki"),
         ("NRT", "Narita International Airport", "Japan", "Tokyo"),
         ("LHR", "Heathrow Airport", "United Kingdom", "London"),
         ("SIN", "Changi Airport", "Singapore", "Singapore"),
@@ -42,7 +42,7 @@ def establish_database(cursor):
         ("BKK", "Suvarnabhumi Airport", "Thailand", "Bangkok"),
         ("SYD", "Sydney Airport", "Australia", "Sydney"),
         ("JFK", "John F. Kennedy International Airport", "USA", "New York"),
-        ("LAX", "Los Angeles International Airport", "USA", "Los Angeles"),
+        ("MIA", "Miami International Airport", "USA", "Miami"),
         ("CDG", "Charles de Gaulle Airport", "France", "Paris")     
     ]
 
@@ -60,31 +60,30 @@ def establish_database(cursor):
     ]
 
     default_route_data = [
-        ("CX001", 300, "HKG", "NRT"),
-        ("CX002", 840, "HKG", "LHR"),
-        ("CX003", 240, "HKG", "SIN"),
-        ("CX004", 210, "HKG", "ICN"),
-        ("CX005", 180, "HKG", "BKK"),
-        ("CX006", 540, "HKG", "SYD"),
-        ("CX007", 900, "HKG", "JFK"),
-        ("CX008", 780, "HKG", "LAX"),
-        ("CX009", 780, "HKG", "CDG"),
-        ("CX010", 240, "SIN", "BKK")
+        ("AY001", 300, "HEL", "NRT"),
+        ("AY002", 840, "HEL", "LHR"),
+        ("AY003", 240, "HEL", "SIN"),
+        ("AY004", 210, "HEL", "ICN"),
+        ("AY005", 180, "HEL", "BKK"),
+        ("AY006", 540, "HEL", "SYD"),
+        ("AY007", 900, "HEL", "JFK"),
+        ("AY008", 780, "HEL", "MIA"),
+        ("AY009", 780, "HEL", "CDG"),
+        ("AY010", 240, "HEL", "BKK")
     ]
 
     default_flight_data = [
-        ("F001", "2026-06-10 08:00", "Arrived", "CX001", "P001", "P002"),
-        ("F002", "2026-06-10 12:00", "Departed", "CX002", "P003", "P004"),
-        ("F003", "2026-06-11 09:00", "Delayed", "CX003", "P005", "P006"),
-        ("F004", "2026-06-11 14:30", "On Schedule", "CX004", "P007", "P008"),
-        ("F005", "2026-06-12 07:15", "Cancelled", "CX005", "P009", "P010"),
-        ("F006", "2026-06-12 16:00", "On Schedule", "CX006", "P001", "P004"),
-        ("F007", "2026-06-13 10:45", "On Schedule", "CX007", "P003", "P006"),
-        ("F008", "2026-06-13 20:00", "Delayed", "CX008", "P005", "P008"),
-        ("F009", "2026-06-14 06:30", "On Schedule", "CX009", "P007", "P010"),
-        ("F010", "2026-06-14 11:20", "On Schedule", "CX010", "P009", "P002")
+        ("F001", "2026-06-10 08:00", "Arrived", "AY001", "P001", "P002"),
+        ("F002", "2026-06-10 12:00", "Departed", "AY002", "P003", "P004"),
+        ("F003", "2026-06-11 09:00", "Delayed", "AY003", "P005", "P006"),
+        ("F004", "2026-06-11 14:30", "On Schedule", "AY004", "P007", "P008"),
+        ("F005", "2026-06-12 07:15", "Cancelled", "AY005", "P009", "P010"),
+        ("F006", "2026-06-12 16:00", "On Schedule", "AY006", "P001", "P004"),
+        ("F007", "2026-06-13 10:45", "On Schedule", "AY007", "P003", "P006"),
+        ("F008", "2026-06-13 20:00", "Delayed", "AY008", "P005", "P008"),
+        ("F009", "2026-06-14 06:30", "On Schedule", "AY009", "P007", "P010"),
+        ("F010", "2026-06-14 11:20", "On Schedule", "AY010", "P009", "P002")
         ]    
-    
     
     try:        
         cursor.execute('''

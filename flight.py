@@ -2,9 +2,9 @@
 
 # flight.py
 # Handles all flight-related operations:
-#   - add_new_flight            → Menu 2.4 (Add new flight)
-#   - view_flights_by_criteria  → Menu 3   (View flights by criteria)
-#   - update_flight_information → Menu 4   (Update flight information)
+#   - add_new_flight                → Menu 2.4 (Add new flight)
+#   - view_flights_by_criteria      → Menu 3   (View flights by criteria)
+#   - update_flight_information     → Menu 4   (Update flight information)
 #   - flight_summary_by_destination → Menu 8.1
 #   - flight_summary_by_pilot       → Menu 8.2
 
@@ -36,14 +36,14 @@ def _prompt_status(current=None):
     if current:
         # Allow blank input to keep the existing value
         while True:
-            raw_input = input(f"Please choose 1-5 [current: {current}] (Note: Press Enter to keep current): ").strip()
+            raw_input = input(f"Please choose 1-5 [Current choice: {current}] (Note: Press <Enter> to keep current): ").strip()
             if not raw_input:
                 return current          # keep unchanged
             if raw_input in ("1", "2", "3", "4", "5"):
                 return STATUS_MAP[raw_input]
-            print("Sorry. Input is invalid. Please choose 1-5 only.")
+            print("Sorry. Input invalid. Please only choose from 1-5.")
     else:
-        raw_input = valid_choice("Please choose 1-5: ", ["1", "2", "3", "4", "5"])
+        raw_input = valid_choice("Please choose from 1-5: ", ["1", "2", "3", "4", "5"])
         return STATUS_MAP[raw_input]
 
 
@@ -54,40 +54,40 @@ def add_new_flight(connection, cursor):
     print("\n<----- Add a New Flight ----->")
 
     # Provide a flight ID that conforms to a prescribed format (i.e., 1 uppercase letter followed by 3 digits).
-    flight_id = valid_id_input("Enter Flight ID (e.g. F001): ", r"^[A-Z][0-9]{3}$", "e.g., F001")
+    flight_id = valid_id_input("Please provide a flight ID (e.g. F001): ", r"^[A-Z][0-9]{3}$", "e.g., F001")
 
     if record_exists(cursor, "Flight", "flight_id", flight_id):
-        print(f"Sorry. Flight {flight_id} already exists in the table. Go to option 4 of main menu if you would like to update flight records.")
+        print(f"Sorry. Flight (ID: {flight_id}) already exists in the table <Flgiht>. Go to <Main Menu → Option 4> to update individual flight record.")
         return
 
-    departure_date_time = valid_date_time_format("Enter departure datetime (YYYY-MM-DD HH:MM:SS): ", mandatory_input=True)
+    departure_date_time = valid_date_time_format("Enter departure date and time (YYYY-MM-DD HH:MM:SS): ", mandatory_input=True)
 
     status = _prompt_status()
 
     while True:
-        route_id = valid_id_input("Enter Route ID: ", r"^[A-Z]{2}[0-9]{3}$", "e.g., CX001")
+        route_id = valid_id_input("Enter route ID (e.g. CX001): ", r"^[A-Z]{2}[0-9]{3}$", "e.g., CX001")
         if not record_exists(cursor, "Route", "route_id", route_id):
-            print(f"Sorry. Route {route_id} is not found in the table Route. Please try again.")
+            print(f"Sorry. Route (ID: {route_id}) is not found in the table <Route>. Please try again.")
             continue
         break
 
     while True:
         captain_id = valid_id_input("Enter Captain Pilot ID: ", r"^[A-Z][0-9]{3}$", "e.g., P001")
         if not record_exists(cursor, "Pilot", "pilot_id", captain_id):
-            print(f"Sorry. Captain {captain_id} is not found in the table Pilot. Please try again.")
+            print(f"Sorry. Captain (ID: {captain_id}) is not found in the table <Pilot>. Please try again.")
             continue
         if not valid_pilot_rank(cursor, captain_id, "Captain"):
-            print(f"Sorry. Pilot {captain_id} does not hold the rank of Captain. Please try again.")
+            print(f"Sorry. Pilot (ID: {captain_id}) does not hold the rank of Captain. Please try again.")
             continue
         break
 
     while True:
         first_officer_id = valid_id_input("Enter First Officer Pilot ID: ", r"^[A-Z][0-9]{3}$", "e.g., P001")
         if not record_exists(cursor, "Pilot", "pilot_id", first_officer_id):
-            print(f"Sorry. First Officer {first_officer_id} is not found in the table Pilot. Please try again.")
+            print(f"Sorry. First Officer (ID: {first_officer_id}) is not found in the table <Pilot>. Please try again.")
             continue
         if not valid_pilot_rank(cursor, first_officer_id, "First Officer"):
-            print(f"Sorry. Pilot {first_officer_id} does not hold the rank of First Officer. Please try again.")
+            print(f"Sorry. Pilot (ID: {first_officer_id}) does not hold the rank of First Officer. Please try again.")
             continue
         break
 
@@ -98,9 +98,9 @@ def add_new_flight(connection, cursor):
             VALUES (?, ?, ?, ?, ?, ?)
         """, (flight_id, departure_date_time, status, route_id, captain_id, first_officer_id))
         connection.commit()
-        print(f"Great! Flight {flight_id} is successfully added to the table Flight.")
+        print(f"Great! Flight (ID: {flight_id}) is added to the table <Flight>.")
     except Exception as e:
-        print("Sorry. Failure in addition of flight:", e)
+        print("Sorry. Failure in operation <Add a new flight>: ", e)
 
 
 # Function to view flights by user-defined criteria
@@ -110,7 +110,6 @@ def view_flights_by_criteria(cursor):
     All filters are optional — press Enter to skip any of them.
     """
     print("\n<----- View Flights by Criteria ----->")
-    print("Please leave the field blank to skip the filter.\n")
 
     # Departure date filter — only require input of departure date if the user wants to filter by departure date
     # valid_choice is configured to ensure non-empty input
@@ -119,18 +118,22 @@ def view_flights_by_criteria(cursor):
         departure_date = valid_date_format("Date of Departure (Input Format: YYYY-MM-DD): ")
 
     # Status filter — only show the menu if the user wants to filter by status
-    filter_by_status = valid_choice("Do you want to apply filter by flight status? (Y/N): ", ["Y", "N"])
     status_filter = None
+    filter_by_status = valid_choice("Do you want to apply filter by flight status? (Y/N): ", ["Y", "N"])
     if filter_by_status == "Y":
         status_filter = _prompt_status()
 
-    destination_country = input("Destination country: ").strip()
+    # Destination filter
+    destination_country = input("Destination country (enter to skip): ").strip()
+    destination_city = input("Destination city (enter to skip): ").strip()
 
-    destination_city = input("Destination city: ").strip()
-
+    parameter = []
+    
     query = """
         SELECT flight.flight_id,
                flight.departure_date_time,
+               strftime('%Y-%m-%d %H:%M', datetime(flight.departure_date_time, '+' || route.duration_minutes || ' minutes')) AS arrival_date_time,
+               printf('%02d', route.duration_minutes / 60) || ':' || printf('%02d', route.duration_minutes % 60) AS duration_hours_minutes,
                flight.status,
                origin_airport.country AS from_country,
                origin_airport.city AS from_city,
@@ -142,7 +145,7 @@ def view_flights_by_criteria(cursor):
         JOIN Airport destination_airport ON route.destination_airport_id = destination_airport.airport_id
         WHERE 1 = 1
     """
-    parameter = []
+
 
     if departure_date:
         query += " AND flight.departure_date_time LIKE ?"
@@ -168,13 +171,15 @@ def view_flights_by_criteria(cursor):
     if not rows:
         print("\nSorry. No flights can be found for these criteria.")
         return
-
-    print("\n{:<10} {:<22} {:<12} {:<12} {:<18} {:<12} {}".format(
-        "Flight", "Departure Date and Time", "Status", "From Country", "From City", "To Country", "To City"))
-    print("-" * 100)
+    
+    print(f"\n<----- Flight Schedule (Number of records: {len(rows)}) ----->")
+    print()
+    print("\n{:<6} {:<21} {:<19} {:<10} {:<13} {:<14} {:<14} {:<14} {}".format(
+        "Flight", "Departure Date/Time", "Arrival Date/Time", "Duration", "Status", "From Country", "From City", "To Country", "To City"))
+    print("-" * 130)
     for row in rows:
-        print("{:<10} {:<22} {:<12} {:<12} {:<18} {:<12} {}".format(
-            row[0], row[1], row[2], row[3], row[4], row[5], row[6]))
+        print("{:<6} {:<21} {:<19} {:<10} {:<13} {:<14} {:<14} {:<14} {}".format(
+            row[0], row[1], row[2], row[3], row[4], row[5], row[6], row[7], row[8]))
 
 # Function to update flight information (departure datetime and status)
 def update_flight_information(connection, cursor):
