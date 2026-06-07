@@ -100,16 +100,6 @@ def valid_id_input(system_prompt, pattern, example):
             print(f"Invalid input. The input should conform to a prescribed format (e.g., {example}). Try again.")
 
 def valid_date_time_format(system_prompt, mandatory_input):
-    """
-    Repeatedly prompts the user until a valid datetime is entered
-    in YYYY-MM-DD HH:MM format.
-
-    - Uses datetime.strptime to validate both format AND calendar logic
-      (e.g. rejects Feb 31, month 13, hour 25, etc.)
-    - Re-formats via strftime to normalise edge cases
-      (e.g. user types 2026-6-6 9:5:0 → stored as 2026-06-06 09:05:00)
-    - Returns the validated string, ready for SQLite datetime() calculations.
-    """
     pattern = "%Y-%m-%d %H:%M"
     while True:
         if mandatory_input == True:
@@ -124,17 +114,15 @@ def valid_date_time_format(system_prompt, mandatory_input):
         except ValueError:
             print("Sorry. The date and time format is invalid. Please use YYYY-MM-DD HH:MM (e.g. 2026-06-06 14:30). Try again.")
 
-def valid_date_format(system_prompt):
-    """
-    Prompts the user for a date in YYYY-MM-DD format.
-    - Allows blank input (returns None) — used for optional search filters.
-    - Uses datetime.strptime to validate calendar logic
-      (e.g. rejects Feb 31, month 13, etc.)
-    - Returns the validated date string, or None if left blank.
-    """
+def valid_date_format(system_prompt, mandatory_input):
     pattern = "%Y-%m-%d"
     while True:
-        user_input = non_empty_input(system_prompt)
+        if mandatory_input == True:
+            user_input = non_empty_input(system_prompt)
+        else:
+            user_input = input(system_prompt).strip()
+            if not user_input:
+                return None
         try:
             parsed_input = datetime.strptime(user_input, pattern)
             return parsed_input.strftime(pattern)
