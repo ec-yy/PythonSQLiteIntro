@@ -22,12 +22,12 @@ from datetime import datetime
 
 # ── 1. Functions - Business Rules ────────────────────────────────────────────────────────────
 
-def record_exists(cursor, table, primary_key_column, primary_key_value):  
+def record_exists(cursor, table, column, value):  
     if not valid_table(table):
         return False
     
-    query = f"SELECT 1 FROM {table} WHERE {primary_key_column} = ?"
-    cursor.execute(query, (primary_key_value,))
+    query = f"SELECT 1 FROM {table} WHERE {column} = ?"
+    cursor.execute(query, (value,))
     return cursor.fetchone() is not None
 
 def valid_table(table):
@@ -148,21 +148,19 @@ def view_table(cursor, table_name, columns="*", order_by=None):
     query = f"SELECT {columns} FROM {table_name}"
     if order_by:
         query = query + f" ORDER BY {order_by}"
-
     cursor.execute(query)
     rows = cursor.fetchall()
+
+    print(f"\n<----- {table_name} Complete Records ----->")
+    if not rows:
+        print(f"No records were found in {table_name}.")
+        return
 
     # Fetch and print column names.
     column_names = [col[0] for col in cursor.description]
     header = " , ".join(column_names)
     print("\n" + header)
-    print("-" * len(header))
 
     # Print rows if there are records in the table.
-    if not rows:
-        print(f"No records were found in {table_name}.")
-        return
-
-    print(f"\n<----- {table_name} Complete Records ----->")
     for row in rows:
         print(row)

@@ -11,7 +11,7 @@ from flight import add_new_flight, flight_summary_by_destination, flight_summary
 
 # Functions for different menu views and navigation.
 def menu_main():
-    print("\n\n<===== Flight Management Application Main Menu =====>")
+    print("\n<===== Flight Management Application Main Menu =====>")
     print("1. All: View")
     print("2. All: Add")
     print("3. All: Summary reports")
@@ -23,7 +23,7 @@ def menu_main():
     print("0. Exit")
 
 def sub_menu_view():
-    print("\n\n<----- Sub Menu 1: View ----->")
+    print("\n<----- Sub Menu 1: View ----->")
     print("1. View All: Airports")
     print("2. View All: Routes")
     print("3. View All: Pilots")
@@ -31,7 +31,7 @@ def sub_menu_view():
     print("0. Back")
 
 def sub_menu_add():
-    print("\n\n<----- Sub Menu 2: Add ----->")
+    print("\n<----- Sub Menu 2: Add ----->")
     print("1. Add: Airport")
     print("2. Add: Route")
     print("3. Add: Pilot")
@@ -39,7 +39,7 @@ def sub_menu_add():
     print("0. Back")
 
 def sub_menu_summary():
-    print("\n\n<----- Sub Menu 3: Summary Reports ----->    ")
+    print("\n<----- Sub Menu 3: Summary Reports ----->    ")
     print("1. Number of Flights: Each destination")
     print("2. Number of Flights: Each pilot")
     print("0. Back")

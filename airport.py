@@ -65,9 +65,9 @@ def view_update_airport(connection, cursor):
         return
 
     print("Press <Enter> to keep the value in current field.")
-    revised_name = input(f"New airport name (Old: {row[1]}): ").strip()
-    revised_country = input(f"New country (Old: {row[2]}): ").strip()
-    revised_city = input(f"New city (Old: {row[3]}): ").strip()
+    revised_name = input(f"New airport name (Old name: {row[1]}): ").strip()
+    revised_country = input(f"New country (Old name: {row[2]}): ").strip()
+    revised_city = input(f"New city (Old name: {row[3]}): ").strip()
 
     updated_name = revised_name if revised_name else row[1]
     updated_country = revised_country if revised_country else row[2]

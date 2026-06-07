@@ -53,7 +53,7 @@ def add_new_flight(connection, cursor):
         return
 
     # Provide departure date and time in a valid format (i.e., YYYY-MM-DD HH:MM:SS).
-    departure_date_time = valid_date_time_format("Enter departure date and time (YYYY-MM-DD HH:MM:SS): ", mandatory_input=True)
+    departure_date_time = valid_date_time_format("Enter departure date and time (YYYY-MM-DD HH:MM): ", mandatory_input=True)
 
     status = _prompt_status()
 
@@ -98,6 +98,58 @@ def add_new_flight(connection, cursor):
         print(f"Great! Flight (ID: {flight_id}) is added to the table <Flight>.")
     except Exception as e:
         print("Sorry. Failure in operation <Add a new flight>: ", e)
+
+
+def flight_summary_by_destination(cursor):
+    cursor.execute("""
+        SELECT airport.country,
+               airport.city,
+               COUNT(*) AS flight_count
+        FROM Flight flight
+        JOIN Route route ON flight.route_id = route.route_id
+        JOIN Airport airport ON route.destination_airport_id = airport.airport_id
+        GROUP BY airport.airport_id
+        ORDER BY flight_count DESC
+    """)
+    rows = cursor.fetchall()
+
+    print(f"\n<----- Number of Flights by Destination (Number of records: {len(rows)})----->")
+    if not rows:
+        print("Sorry. No flight data is available.")
+        return
+
+    print("\n{:<22} {:<20} {}".format("Destination Country", "Destination City", "No. of Flights"))
+    print("-" * 58)
+    for row in rows:
+        print("{:<22} {:<20} {}".format(row[0], row[1], row[2]))
+
+
+def flight_summary_by_pilot(cursor):
+    cursor.execute("""
+        SELECT pilot.pilot_id,
+               pilot.first_name || ' ' || pilot.last_name AS full_name,
+               pilot.rank,
+               COUNT(*) AS flight_count
+        FROM Pilot pilot
+        JOIN Flight flight
+          ON pilot.pilot_id = flight.captain_pilot_id
+          OR pilot.pilot_id = flight.first_officer_pilot_id
+        GROUP BY pilot.pilot_id
+        ORDER BY flight_count DESC
+    """)
+    rows = cursor.fetchall()
+
+    print(f"\n<----- Flight Summary by Pilot (Number of records: {len(rows)}) ----->")
+    if not rows:
+        print("Sorry. No pilot assignment data is available.")
+        return
+
+    print("\n{:<10} {:<28} {:<18} {}".format(
+        "Pilot ID", "Full Name", "Rank", "Flights"))
+    print("-" * 65)
+    for row in rows:
+        print("{:<10} {:<28} {:<18} {}".format(
+            row[0], row[1], row[2], row[3]))
 
 
 # Function to view flights by user-defined criteria
@@ -162,8 +214,7 @@ def view_flights_by_criteria(cursor):
         print("\nSorry. No flights are found for these criteria.")
         return
     
-    print(f"\n<----- Flight Schedule (Number of records: {len(rows)}) ----->")
-    print()
+    print(f"\n<----- Flight Schedule (Number of records: {len(rows)}) ----->")   
     print("\n{:<6} {:<21} {:<19} {:<10} {:<13} {:<14} {:<14} {:<14} {}".format(
         "Flight", "Departure Date/Time", "Arrival Date/Time", "Duration", "Status", "From Country", "From City", "To Country", "To City"))
     print("-" * 130)
@@ -219,64 +270,3 @@ def update_flight_information(connection, cursor):
 
     except Exception as e:
         print(f"Sorry. Database error when updating flight (ID: {flight_id}): {e}")
-
-
-def flight_summary_by_destination(cursor):
-    """
-    Aggregate report: total number of flights grouped by destination city.
-    Maps to Menu 8.1.
-    """
-    print("\n<----- Number of Flights by Destination ----->")
-    cursor.execute("""
-        SELECT airport.country,
-               airport.city,
-               COUNT(*) AS flight_count
-        FROM Flight flight
-        JOIN Route route ON flight.route_id = route.route_id
-        JOIN Airport airport ON route.destination_airport_id = airport.airport_id
-        GROUP BY airport.airport_id
-        ORDER BY flight_count DESC
-    """)
-    rows = cursor.fetchall()
-
-    if not rows:
-        print("Sorry. No flight data is available.")
-        return
-
-    print("\n{:<18} {:<22} {}".format("Destination Country", "City", "No. of Flights"))
-    print("-" * 50)
-    for row in rows:
-        print("{:<18} {:<22} {}".format(row[0], row[1], row[2]))
-
-
-def flight_summary_by_pilot(cursor):
-    """
-    Aggregate report: total number of flights assigned to each pilot.
-    Counts flights where the pilot appears as either Captain or First Officer.
-    Maps to Menu 8.2.
-    """
-    print("\n<----- Flight Summary by Pilot ----->")
-    cursor.execute("""
-        SELECT pilot.pilot_id,
-               pilot.first_name || ' ' || pilot.last_name AS full_name,
-               pilot.rank,
-               COUNT(*) AS flight_count
-        FROM Pilot pilot
-        JOIN Flight flight
-          ON pilot.pilot_id = flight.captain_pilot_id
-          OR pilot.pilot_id = flight.first_officer_pilot_id
-        GROUP BY pilot.pilot_id
-        ORDER BY flight_count DESC
-    """)
-    rows = cursor.fetchall()
-
-    if not rows:
-        print("Sorry. No pilot assignment data is available.")
-        return
-
-    print("\n{:<10} {:<28} {:<18} {}".format(
-        "Pilot ID", "Full Name", "Rank", "Flights"))
-    print("-" * 65)
-    for row in rows:
-        print("{:<10} {:<28} {:<18} {}".format(
-            row[0], row[1], row[2], row[3]))

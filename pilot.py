@@ -20,7 +20,11 @@ def add_new_pilot(connection, cursor):
 
     # Provide aviation license ID, first name and last name of the pilot. All of them must be non-empty strings.
     # The license ID should conform to a prescribed format (i.e., 3 uppercase letter followed by 3 digits).
-    license_id = valid_id_input("Please provide license ID (e.g., PLI001): ", r"^[A-Z]{3}[0-9]{3}$", "e.g., PLI001")
+    while True:
+        license_id = valid_id_input("Please provide license ID (e.g., PLI001): ", r"^[A-Z]{3}[0-9]{3}$", "e.g., PLI001")
+        if not record_exists(cursor, "Pilot", "license_id", license_id):
+            break
+        print(f"Sorry. License ID (ID: {license_id}) already exists in the table. Please try again")
     first_name = non_empty_input("First name: ")
     last_name = non_empty_input("Last name: ")
 
