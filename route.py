@@ -1,4 +1,8 @@
-from rule import positive_integer_input, valid_id_input, record_exists
+# This module defines functions to undertake route-related operations, including:
+#   - add_new_route              → Menu 2.2 (Add new route)
+
+
+from rule import record_exists, positive_integer_input, valid_id_input
 
 
 # Function to add a new route.  

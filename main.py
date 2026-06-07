@@ -14,8 +14,8 @@ def menu_main():
     print("3. All: Summary reports")
     print("4. Flight: View flights by criteria")
     print("5. Flight: Update flight information")
-    print("6. Pilot: Assign pilot to flight")
-    print("7. Pilot: View pilot schedule")
+    print("6. Pilot: View pilot schedule")
+    print("7. Pilot: Assign pilot to flight")
     print("8. Airport: View or update airport information")
     print("0. Exit")
 
@@ -61,7 +61,7 @@ def navigate_menu(connection, cursor):
                 elif sub_choice == "0":
                     break
                 else:
-                    print("Invalid option. Please try again.")
+                    print("Sorry. Invalid input. Please try again.")
 
         elif choice == "2":
             while True:
@@ -78,7 +78,7 @@ def navigate_menu(connection, cursor):
                 elif sub_choice == "0":
                     break
                 else:
-                    print("Invalid option. Please try again.")
+                    print("Sorry. Invalid input. Please try again.")
 
         elif choice == "3":
             while True:
@@ -91,7 +91,7 @@ def navigate_menu(connection, cursor):
                 elif sub_choice == "0":
                     break
                 else:
-                    print("Invalid option. Please try again.")
+                    print("Sorry. Invalid input. Please try again.")
 
         elif choice == "4":
             view_flights_by_criteria(cursor)
@@ -100,10 +100,10 @@ def navigate_menu(connection, cursor):
             update_flight_information(connection, cursor)
 
         elif choice == "6":
-            assign_pilot_to_flight(connection, cursor)
+            view_pilot_schedule(cursor)
 
         elif choice == "7":
-            view_pilot_schedule(cursor)
+            assign_pilot_to_flight(connection, cursor)
 
         elif choice == "8":
             view_update_airport(connection, cursor)
@@ -113,7 +113,7 @@ def navigate_menu(connection, cursor):
             break
 
         else:
-            print("Invalid option. Please try again.")
+            print("Sorry. Invalid input. Please try again.")
 
 
 

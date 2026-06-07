@@ -1,17 +1,25 @@
-from rule import non_empty_input, valid_choice, valid_id_input, record_exists
+# This module contains functions to undertake pilot-related opeartions, including:
+#   - add_new_pilot              → Menu 2.3 (Add new pilot)
+#   - view_pilot_schedule        → Menu 6 (View pilot schedule)
+#   - assign_pilot_to_flight     → Menu 7 (Assign a pilot to a flight)
+
+from rule import record_exists, non_empty_input, valid_choice, valid_id_input 
+
+
+# ── Functions ───────────────────────────────────────────────────────────────────
 
 # Function to add a new pilot
 def add_new_pilot(connection, cursor):
     print("\n<----- Add New Pilot ----->")
     
-    # Provide a pliot ID that conforms to a prescribed format (i.e., 1 uppercase letter followed by 3 digits).
+    # Provide a pliot ID in a prescribed format (i.e., 1 uppercase letter followed by 3 digits).
     pilot_id = valid_id_input("Please provide pilot ID (e.g., P001): ", r"^[A-Z][0-9]{3}$", "e.g., P001")
     if record_exists(cursor, "Pilot", "pilot_id", pilot_id):
-        print(f"Sorry. Pilot {pilot_id} already exists in the table.")
+        print(f"Sorry. Pilot (ID: {pilot_id}) already exists in the table.")
         return
 
-    # Provide aviation license ID, first name, last name of the pilot. All of them must be non-empty strings.
-    # The license ID should conform to a prescribed format (i.e., 1 uppercase letter followed by 3 digits).
+    # Provide aviation license ID, first name and last name of the pilot. All of them must be non-empty strings.
+    # The license ID should conform to a prescribed format (i.e., 3 uppercase letter followed by 3 digits).
     license_id = valid_id_input("Please provide license ID (e.g., PLI001): ", r"^[A-Z]{3}[0-9]{3}$", "e.g., PLI001")
     first_name = non_empty_input("First name: ")
     last_name = non_empty_input("Last name: ")
@@ -20,27 +28,27 @@ def add_new_pilot(connection, cursor):
     input_rank = valid_choice("What is the pilot's rank (Select 1 for Captain, 2 for First Officer): ", ["1", "2"])
     final_rank = "Captain" if input_rank == "1" else "First Officer"
 
-    # Try to add a new pilot to the table Pilot based on user input and catch any exception.
+    # Try to add a new pilot to the table <Pilot> based on user input and catch any exception.
     try:
         cursor.execute("""
             INSERT INTO Pilot (pilot_id, license_id, first_name, last_name, rank)
             VALUES (?, ?, ?, ?, ?)
         """, (pilot_id, license_id, first_name, last_name, final_rank))
         connection.commit()
-        print(f"Great! Pilot {pilot_id} is added successfully to the table Pilot.")
+        print(f"Great! Pilot (ID: {pilot_id}) is added to the table <Pilot>.")
     except Exception as e:
-        print("Sorry. Failure in addition of pilot: ", e)
+        print("Sorry. Failure in operation <Add a new pilot>: ", e)
 
 
 # Function to view specific pilot schedule
 def view_pilot_schedule(cursor):
     print("\n<----- View Pilot Schedule ----->")
     
-    # Provide a pilot ID that conforms to a prescribed format (i.e., 1 uppercase letter followed by 3 digits).
-    pilot_id = valid_id_input("Please provide Pilot ID: ", r"^[A-Z][0-9]{3}$", "e.g., P001")
+    # Provide a pilot ID in a prescribed format (i.e., 1 uppercase letter followed by 3 digits).
+    pilot_id = valid_id_input("Please provide Pilot ID (e.g., P001): ", r"^[A-Z][0-9]{3}$", "e.g., P001")
 
     if not record_exists(cursor, "Pilot", "pilot_id", pilot_id):
-        print(f"Sorry. Pilot {pilot_id} is not found from the table Pilot.")
+        print(f"Sorry. Pilot (ID: {pilot_id}) is not found in the table <Pilot>.")
         return
 
     cursor.execute("""
@@ -65,10 +73,10 @@ def view_pilot_schedule(cursor):
     rows = cursor.fetchall()
 
     if not rows:
-        print(f"Sorry. Pilot {pilot_id} has no scheduled flights.")
+        print(f"Sorry. Pilot (ID: {pilot_id}) has no scheduled flights.")
         return
 
-    print(f"\n<----- Flight Schedule (Number of records: {len(rows)}) ----->")
+    print(f"\n<----- Flight Schedule for Pilot (ID: {pilot_id}) (Number of records: {len(rows)}) ----->")
     print()
     print("{:<7} {:<6} {:<20} {:<19} {:<10} {:<13} {:<14} {:<14} {:<14} {}".format(
         "Flight", "Route", "Departure Date/Time", "Arrival Date/Time", "Duration", "Status",
@@ -81,23 +89,26 @@ def view_pilot_schedule(cursor):
 
 # Function to assign a pilot to a flight
 def assign_pilot_to_flight(connection, cursor):
-    print("\n<----- Assign Pilot to Flight ----->")
-    print("\nNote: Any pre-existing pilot assignment for the flight will be superseded by your new assignment.")
+    print("\n<----- Pilot Assignment ----->")
+    print("Note: Any pre-existing pilot assignment for the flight will be superseded by the new assignment.")
+    
     flight_id = valid_id_input("Please provide flight ID (e.g., F001): ", r"^[A-Z][0-9]{3}$", "e.g., F001")
-
     if not record_exists(cursor, "Flight", "flight_id", flight_id):
-        print(f"Sorry. Flight {flight_id} is not found from the table Flight.")
+        print(f"Sorry. Flight (ID: {flight_id}) is not found in the table <Flight>.")
         return
-
-    role_choice = valid_choice("What is the pilot's rank (Select 1 for Captain, 2 for First Officer): ", ["1", "2"])
-
+    
     pilot_id = valid_id_input("Please provide pilot ID (e.g., P001): ", r"^[A-Z][0-9]{3}$", "e.g., P001")
+    cursor.execute("""
+        SELECT rank
+        FROM Pilot
+        WHERE pilot_id = ?
+    """, (pilot_id,))
+    row = cursor.fetchone()
+    if not row:
+        print(f"Sorry. Pilot (ID: {pilot_id}) is not found in the table <Pilot>.")
+        return  
 
-    if not record_exists(cursor, "Pilot", "pilot_id", pilot_id):
-        print(f"Sorry. Pilot {pilot_id} is not found from the table Pilot.")
-        return
-
-    column = "captain_pilot_id" if role_choice == "1" else "first_officer_pilot_id"
+    column = "captain_pilot_id" if row[0] == "Captain" else "first_officer_pilot_id"
 
     # Try to update the flight record with the new pilot assignment based on user input and catch any exception.
     # This assumes that any pre-existing pilot assignment for the flight will be superseded by your new assignment.
@@ -108,6 +119,7 @@ def assign_pilot_to_flight(connection, cursor):
             WHERE flight_id = ?
         """, (pilot_id, flight_id))
         connection.commit()
-        print(f"Great! Pilot {pilot_id} is successfully assigned to flight {flight_id}.")
+        print(f"Great! Pilot (ID: {pilot_id}) is assigned to a flight (ID: {flight_id}).")
+    
     except Exception as e:
-        print(f"Sorry. Error when assigning pilot {pilot_id} to flight {flight_id}: {e}")
+        print(f"Sorry. Database error when assigning pilot (ID: {pilot_id}) to flight (ID: {flight_id}): {e}")
