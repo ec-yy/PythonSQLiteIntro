@@ -144,6 +144,7 @@ def valid_date_format(system_prompt):
 # ── 3. Functions - Common Utilities ────────────────────────────────────────────────────────────
 
 def view_table(cursor, table_name, columns="*", order_by=None):
+    # Fetch complete records of a table.
     query = f"SELECT {columns} FROM {table_name}"
     if order_by:
         query = query + f" ORDER BY {order_by}"
@@ -151,6 +152,13 @@ def view_table(cursor, table_name, columns="*", order_by=None):
     cursor.execute(query)
     rows = cursor.fetchall()
 
+    # Fetch and print column names.
+    column_names = [col[0] for col in cursor.description]
+    header = " , ".join(column_names)
+    print("\n" + header)
+    print("-" * len(header))
+
+    # Print rows if there are records in the table.
     if not rows:
         print(f"No records were found in {table_name}.")
         return
