@@ -1,3 +1,5 @@
+# This module contains functions to undertake flight-related operations, including:
+
 # flight.py
 # Handles all flight-related operations:
 #   - add_new_flight            → Menu 2.4 (Add new flight)
@@ -6,7 +8,7 @@
 #   - flight_summary_by_destination → Menu 8.1
 #   - flight_summary_by_pilot       → Menu 8.2
 
-from rule import valid_id_input, valid_date_time_format, valid_date_format, valid_choice, validate_pilot_rank, record_exists
+from rule import valid_id_input, valid_date_time_format, valid_date_format, valid_choice, valid_pilot_rank, record_exists
 
 # ── Constants ────────────────────────────────────────────────────────────────
 
@@ -74,7 +76,7 @@ def add_new_flight(connection, cursor):
         if not record_exists(cursor, "Pilot", "pilot_id", captain_id):
             print(f"Sorry. Captain {captain_id} is not found in the table Pilot. Please try again.")
             continue
-        if not validate_pilot_rank(cursor, captain_id, "Captain"):
+        if not valid_pilot_rank(cursor, captain_id, "Captain"):
             print(f"Sorry. Pilot {captain_id} does not hold the rank of Captain. Please try again.")
             continue
         break
@@ -84,7 +86,7 @@ def add_new_flight(connection, cursor):
         if not record_exists(cursor, "Pilot", "pilot_id", first_officer_id):
             print(f"Sorry. First Officer {first_officer_id} is not found in the table Pilot. Please try again.")
             continue
-        if not validate_pilot_rank(cursor, first_officer_id, "First Officer"):
+        if not valid_pilot_rank(cursor, first_officer_id, "First Officer"):
             print(f"Sorry. Pilot {first_officer_id} does not hold the rank of First Officer. Please try again.")
             continue
         break

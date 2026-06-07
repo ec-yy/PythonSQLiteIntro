@@ -1,3 +1,7 @@
+# This module contains functions to undertake airport-related opeartions, including:
+#   - add_new_airport           → Menu 2.1 (Add new airport)
+#   - view_update_airport       → Menu 2.7 (View or update airport information)
+
 from rule import non_empty_input, valid_choice, valid_id_input, record_exists
 
 # Function to add a new airport

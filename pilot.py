@@ -48,6 +48,7 @@ def view_pilot_schedule(cursor):
                route.route_id,
                flight.departure_date_time,
                datetime(flight.departure_date_time, '+' || route.duration_minutes || ' minutes') AS arrival_date_time,
+               printf('%02d', route.duration_minutes / 60) || ':' || printf('%02d', route.duration_minutes % 60) AS duration_hhmm,
                flight.status,
                origin_airport.country AS from_country,
                origin_airport.city AS from_city,
@@ -69,8 +70,8 @@ def view_pilot_schedule(cursor):
 
     print(f"\nSchedule for Pilot {pilot_id}:")
     for row in rows:
-        print(f"  Flight: {row[0]} | Route: {row[1]} | Depart: {row[2]} | Arrive: {row[3]}"
-                f" | Status: {row[4]} | From: {row[5]}, {row[6]} → To: {row[7]}, {row[8]}")
+        print(f"  Flight: {row[0]} | Route: {row[1]} | Depart: {row[2]} | Arrive: {row[3]} | Duration (Minutes) {row[4]} : {row[4]}"
+                f" | Status: {row[5]} | From: {row[6]}, {row[7]} → To: {row[8]}, {row[9]}")
 
 
 # Function to assign a pilot to a flight

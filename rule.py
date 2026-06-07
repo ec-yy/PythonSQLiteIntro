@@ -1,14 +1,26 @@
+# This module contains functions to handle business rules, user input validation common to all other modules, including:
+
+# ────────     1. Business Rules     ────────
+#   1.1 → record_exists              → Check if a record already exists in a table based on a given primary key value
+#   1.2 → valid_table                → Check if a table name is valid
+#   1.3 → valid_pilot_rank           → Check if pilot assignment is in accordance with the rank (i.e., Captain or First Officer)
+
+# ──────── 2. User Input Validation  ────────
+#   2.1 → non_empty_input            → Check if user input is not empty
+#   2.2 → integer_input              → Check if user input is an integer type
+#   2.3 → positive_integer_input     → Check if user input is a positive integer
+#   2.4 → valid_choice               → Check if user input is from a list of valid choice
+#   2.5 → valid_id_input             → Check if user input conforms to a prescribed format (e.g., 1 uppercase letter followed by 3 digits)
+#   2.6 → valid_date_time_format     → Check if user input is in a valid date and time format (i.e., YYYY-MM-DD HH:MM:SS)
+#   2.7 → valid_date_format          → Check if user input is in a valid date format (i.e., YYYY-MM-DD)
+
+# ────────    3. Common Utilities    ────────
+#   3.1 → view_table                 → View complete records of a table with optional ordering
+
 import re
 from datetime import datetime
 
-# ── Functions for checking right table and record pre-existence ────────────────────────────────────────────────────────────
-def valid_table(table):
-    valid_tables = {"Airport", "Route", "Pilot", "Flight"}
-    if not table in valid_tables:
-        print(f"{table} is not valid.")
-        return False
-    return True
-
+# ── 1. Functions - Business Rules ────────────────────────────────────────────────────────────
 
 def record_exists(cursor, table, primary_key_column, primary_key_value):  
     if not valid_table(table):
@@ -18,15 +30,32 @@ def record_exists(cursor, table, primary_key_column, primary_key_value):
     cursor.execute(query, (primary_key_value,))
     return cursor.fetchone() is not None
 
+def valid_table(table):
+    valid_tables = {"Airport", "Route", "Pilot", "Flight"}
+    if not table in valid_tables:
+        print(f"{table} is not valid.")
+        return False
+    return True
 
-# ── Functions for user input validation ────────────────────────────────────────────────────────────
+def valid_pilot_rank(cursor, pilot_id, expected_rank):
+    """
+    Checks that the given pilot holds the expected rank.
+    - expected_rank: "Captain" or "First Officer"
+    - Returns True if rank matches, False otherwise.
+    """
+    cursor.execute("SELECT rank FROM Pilot WHERE pilot_id = ?", (pilot_id,))
+    row = cursor.fetchone()
+    if row and row[0] == expected_rank:
+        return True
+    return False
+
+# ── 2. Functions - User Input Validation ────────────────────────────────────────────────────────────
 def non_empty_input(system_prompt):
     while True:
         user_input = input(system_prompt).strip()
         if user_input:
             return user_input
         print("User input must be non-empty. Try again.")
-
 
 def integer_input(system_prompt):
     while True:
@@ -35,7 +64,6 @@ def integer_input(system_prompt):
             return int(user_input)
         except ValueError:
             print("Invalid input. User input must be an integer. Try again.")
-
 
 def positive_integer_input(system_prompt):
     while True:
@@ -49,10 +77,6 @@ def positive_integer_input(system_prompt):
         except ValueError:
             print("Invalid input. User input must be an integer. Try again.")
 
-
-
-
-
 def valid_choice(system_prompt, choice):
     hint = " / ".join(choice)
     while True:
@@ -60,7 +84,6 @@ def valid_choice(system_prompt, choice):
         if user_input in choice:
             return user_input
         print(f"Sorry. Invalid input. User input must be from {hint} only. Try again.")
-
 
 def valid_id_input(system_prompt, pattern, example):
     while True:
@@ -75,11 +98,10 @@ def valid_id_input(system_prompt, pattern, example):
         else:
             print(f"Invalid input. The input should conform to a prescribed format (e.g., {example}). Try again.")
 
-
 def valid_date_time_format(system_prompt, mandatory_input):
     """
     Repeatedly prompts the user until a valid datetime is entered
-    in YYYY-MM-DD HH:MM:SS format.
+    in YYYY-MM-DD HH:MM format.
 
     - Uses datetime.strptime to validate both format AND calendar logic
       (e.g. rejects Feb 31, month 13, hour 25, etc.)
@@ -87,7 +109,7 @@ def valid_date_time_format(system_prompt, mandatory_input):
       (e.g. user types 2026-6-6 9:5:0 → stored as 2026-06-06 09:05:00)
     - Returns the validated string, ready for SQLite datetime() calculations.
     """
-    pattern = "%Y-%m-%d %H:%M:%S"
+    pattern = "%Y-%m-%d %H:%M"
     while True:
         if mandatory_input == True:
             user_input = non_empty_input(system_prompt)
@@ -99,8 +121,7 @@ def valid_date_time_format(system_prompt, mandatory_input):
             parsed_input = datetime.strptime(user_input, pattern)
             return parsed_input.strftime(pattern)
         except ValueError:
-            print("Sorry. The date and time format is invalid. Please use YYYY-MM-DD HH:MM:SS (e.g. 2026-06-06 14:30:00). Try again.")
-
+            print("Sorry. The date and time format is invalid. Please use YYYY-MM-DD HH:MM (e.g. 2026-06-06 14:30). Try again.")
 
 def valid_date_format(system_prompt):
     """
@@ -119,21 +140,7 @@ def valid_date_format(system_prompt):
         except ValueError:
             print("Sorry. The date format is invalid. Please use YYYY-MM-DD (e.g. 2026-06-06). Try again.")
 
-
-def validate_pilot_rank(cursor, pilot_id, expected_rank):
-    """
-    Checks that the given pilot holds the expected rank.
-    - expected_rank: "Captain" or "First Officer"
-    - Returns True if rank matches, False otherwise.
-    """
-    cursor.execute("SELECT rank FROM Pilot WHERE pilot_id = ?", (pilot_id,))
-    row = cursor.fetchone()
-    if row and row[0] == expected_rank:
-        return True
-    return False
-
-
-# ── General function for view of complete records of a table ────────────────────────────────────────────────────────────
+# ── 3. Functions - Common Utilities ────────────────────────────────────────────────────────────
 def view_table(cursor, table_name, columns="*", order_by=None):
     query = f"SELECT {columns} FROM {table_name}"
     if order_by:
