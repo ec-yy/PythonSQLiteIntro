@@ -98,7 +98,7 @@ def establish_database(cursor):
         cursor.execute('''
                 CREATE TABLE IF NOT EXISTS Pilot (
                     pilot_id TEXT PRIMARY KEY,
-                    license_id TEXT NOT NULL,
+                    license_id TEXT UNIQUE NOT NULL,
                     first_name TEXT NOT NULL,
                     last_name TEXT NOT NULL,
                     rank TEXT NOT NULL
